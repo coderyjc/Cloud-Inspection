@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://101.201.64.102/inspection?serverTimezone=UTC&characterEncoding=utf-8
+    username: inspection
+    password: CZ7rAtD23EaGWG7j
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+  web:
+    resources:
+      static-locations: classpath:/templates/,classpath:/static/
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8080
+  max-http-header-size: 1MB
+
+logging:
+  level:
+    com.jancoyan.jancoblog.mapper: debug
