@@ -25,7 +25,7 @@ public class TestGenerator{
 //        全局配置
         GlobalConfig config = new GlobalConfig();
         config.setAuthor("Jancoyan")
-                .setOutputDir("R:\\GITHUB\\JancoBlog\\JancoBlog-v3.0\\src\\main\\java")
+                .setOutputDir("R:\\GITHUB\\Cloud-Inspection\\Inspection\\src\\main\\java")
                 .setFileOverride(true)
                 .setServiceName("%sService")
                 .setBaseResultMap(true)
@@ -36,19 +36,21 @@ public class TestGenerator{
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
-                .setUrl("jdbc:mysql://101.201.64.102/jancoblog?serverTimezone=UTC&characterEncoding=utf-8")
-                .setUsername("jancoblog")
-                .setPassword("333");
+                .setUrl("jdbc:mysql://101.201.64.102/inspection?serverTimezone=UTC&characterEncoding=utf-8")
+                .setUsername("inspection")
+                .setPassword("CZ7rAtD23EaGWG7j");
 
 //        策略配置
         StrategyConfig strategyConfig = new StrategyConfig();
-        strategyConfig.setTablePrefix("tbl_")
+        strategyConfig.setTablePrefix("")
                 .setColumnNaming(NamingStrategy.underline_to_camel)
-                .setInclude("tbl_deleted_comment");
+                .setInclude("user")
+                .setInclude("damage")
+                .setInclude("task");
 
 //        包名策略配置
         PackageConfig packageConfig = new PackageConfig();
-        packageConfig.setParent("com.jancoyan.jancoblog")
+        packageConfig.setParent("com.stdu.inspection")
                 .setMapper("mapper")
                 .setService("service")
                 .setController("controller")

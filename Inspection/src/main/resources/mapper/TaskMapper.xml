@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stdu.inspection.mapper.TaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stdu.inspection.pojo.Task">
+        <id column="task_id" property="taskId" />
+        <result column="damage_id" property="damageId" />
+        <result column="receiver" property="receiver" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="deadline" property="deadline" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, damage_id, receiver, receive_date, deadline, status
+    </sql>
+
+</mapper>
