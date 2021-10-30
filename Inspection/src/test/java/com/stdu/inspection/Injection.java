@@ -10,7 +10,6 @@ package com.stdu.inspection;
 import com.stdu.inspection.pojo.User;
 import com.stdu.inspection.utils.MD5Util;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.annotation.MapperScan;
 
 
 public class Injection extends InspectionApplicationTests{
@@ -47,7 +46,7 @@ public class Injection extends InspectionApplicationTests{
         user.updateById();
     }
 
-    
+
 
 }
 
