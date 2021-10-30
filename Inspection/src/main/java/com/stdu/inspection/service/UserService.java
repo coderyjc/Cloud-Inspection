@@ -1,5 +1,6 @@
 package com.stdu.inspection.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UserService extends IService<User> {
 
+    /**
+     *
+     * @param pn
+     * @param limit
+     * @return
+     */
+    IPage<User> listAll(String pn, String limit);
+
+    boolean login(String userName, String password);
 }

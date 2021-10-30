@@ -1,7 +1,11 @@
 package com.stdu.inspection.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.Task;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.stdu.inspection.pojo.TaskProcess;
 
 /**
  * <p>
@@ -13,4 +17,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface TaskMapper extends BaseMapper<Task> {
 
+    TaskProcess getTaskProcessById(String taskId);
+
+    IPage<TaskProcess> listTaskByProcess(IPage<TaskProcess> iPage, Wrapper wrapper);
 }

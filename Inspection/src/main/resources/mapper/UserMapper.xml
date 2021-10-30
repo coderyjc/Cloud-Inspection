@@ -5,13 +5,14 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.stdu.inspection.pojo.User">
         <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
         <result column="user_password" property="userPassword" />
         <result column="user_role" property="userRole" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        user_id, user_password, user_role
+        user_id, user_name, user_password, user_role
     </sql>
 
 </mapper>

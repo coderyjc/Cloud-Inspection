@@ -17,4 +17,20 @@
         task_id, damage_id, receiver, receive_date, deadline, status
     </sql>
 
+    <sql id="Task_Process_List">
+        t.task_id, t.damage_id, t.receive_date, t.deadline, t.status, t.receiver, d.post_date,
+        d.location, d.description
+    </sql>
+
+    <select id="getTaskProcessById" resultType="com.stdu.inspection.pojo.TaskProcess">
+        select <include refid="Task_Process_List" />
+        from v_task_process where task_id = ${taskId};
+    </select>
+
+    <select id="listTaskByProcess" resultType="com.stdu.inspection.pojo.TaskProcess">
+        select <include refid="Task_Process_List" />
+        from v_task_process ${wrapper.customSqlSegment}
+    </select>
+
+
 </mapper>

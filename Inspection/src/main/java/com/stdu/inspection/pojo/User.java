@@ -37,4 +37,6 @@ public class User extends Model<User> {
 
     private Integer userRole;
 
+    private String userName;
+
 }
