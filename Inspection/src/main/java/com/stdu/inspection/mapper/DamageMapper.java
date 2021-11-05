@@ -2,6 +2,9 @@ package com.stdu.inspection.mapper;
 
 import com.stdu.inspection.pojo.Damage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author Jancoyan
  * @since 2021-10-20
  */
+@Mapper
 public interface DamageMapper extends BaseMapper<Damage> {
 
 }

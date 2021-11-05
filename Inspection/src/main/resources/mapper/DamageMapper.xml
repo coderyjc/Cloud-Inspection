@@ -19,5 +19,8 @@
     <sql id="Base_Column_List">
         id, post_user, damage_type, railway, damage_level, location, description, post_date, status
     </sql>
+    <select id="selectDamageConut" resultType="java.lang.Integer">
+        select count(*) from damage
+    </select>
 
 </mapper>

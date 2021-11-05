@@ -24,12 +24,12 @@
 
     <select id="getTaskProcessById" resultType="com.stdu.inspection.pojo.TaskProcess">
         select <include refid="Task_Process_List" />
-        from v_task_process where task_id = ${taskId};
+        from v_task_process where task_id = #{taskId};
     </select>
 
     <select id="listTaskByProcess" resultType="com.stdu.inspection.pojo.TaskProcess">
         select <include refid="Task_Process_List" />
-        from v_task_process ${wrapper.customSqlSegment}
+        from v_task_process #{wrapper.customSqlSegment}
     </select>
 
 

@@ -1,5 +1,6 @@
 package com.stdu.inspection.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.Damage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DamageService extends IService<Damage> {
 
+
+    IPage<Damage> damageTodayList(String time, String pn, String limit) ;
 }
