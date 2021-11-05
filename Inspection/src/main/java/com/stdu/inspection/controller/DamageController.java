@@ -3,6 +3,7 @@ package com.stdu.inspection.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.Damage;
+import com.stdu.inspection.pojo.DamageDamageType;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
@@ -38,6 +39,7 @@ public class DamageController {
      * @param  time 前端传过来的字符串类型的时间
      * @return 返回当日的损伤列表
      */
+
     @RequestMapping(value = "/damageTodayList", method = RequestMethod.GET)
     public Msg listDamageToday(
             @RequestParam(value = "time") String time,
@@ -45,7 +47,7 @@ public class DamageController {
             @RequestParam(value = "limit") String limit
     )
     {
-        IPage<Damage> damageTodayList = damageService.listDamageToday(time,pn, limit);
+        IPage<DamageDamageType> damageTodayList = damageService.listDamageToday(time, pn, limit);
         return Msg.success().add("damageTodayList",damageTodayList);
     }
 

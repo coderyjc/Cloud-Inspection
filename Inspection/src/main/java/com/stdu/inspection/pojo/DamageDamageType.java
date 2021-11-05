@@ -56,4 +56,6 @@ public class DamageDamageType {
      */
     private  String typeDescription;
 
+    private Integer damageTypeId;
+
 }

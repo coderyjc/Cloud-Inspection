@@ -27,6 +27,6 @@
 
     <select id="listDamageToday" resultType="com.stdu.inspection.pojo.DamageDamageType">
         select <include refid="Damage_Damage_type_Column_List" />
-        from v_damage_damage_type #{wrapper.customSqlSegment};
+        from v_damage_damage_type where post_date like '%${time}%'
     </select>
 </mapper>

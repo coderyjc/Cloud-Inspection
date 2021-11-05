@@ -5,14 +5,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.mapper.DamageMapper;
+import com.stdu.inspection.pojo.DamageDamageType;
 import com.stdu.inspection.service.DamageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.stdu.inspection.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * <p>
@@ -37,12 +34,13 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
      * @param limit
      * @return
      */
-    @Override
-    public IPage<Damage> listDamageToday(String time, String pn, String limit) {
 
-        QueryWrapper<Damage> wrapper = new QueryWrapper<Damage>();
-        IPage<Damage> iPage = new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
-        wrapper.apply("date_format(post_date,'%Y-%m-%d') = '" + time+ "' ");
-        return baseMapper.listDamageToday(iPage,wrapper);
+    @Override
+    public IPage<DamageDamageType> listDamageToday(String time, String pn, String limit) {
+
+//        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<DamageDamageType>();
+        IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
+//        wrapper.apply("date_format(post_date,'%Y-%m-%d') = '" + time+ "' ");
+        return baseMapper.listDamageToday(iPage,time);
     }
 }

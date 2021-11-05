@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * 损伤类型表
  */
 @TableName("damage_type")
-//@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode()
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
