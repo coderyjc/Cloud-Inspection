@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -70,7 +71,7 @@ public class Damage extends Model<Damage> {
     /**
      * 上传日期
      */
-    private LocalDateTime postDate;
+    private Date postDate;
 
     /**
      * 任务状态，0表示未接收，1表示已接受

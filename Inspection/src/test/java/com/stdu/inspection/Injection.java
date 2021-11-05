@@ -7,9 +7,13 @@
 
 package com.stdu.inspection;
 
+import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.pojo.User;
 import com.stdu.inspection.utils.MD5Util;
 import org.junit.jupiter.api.Test;
+
+import java.util.Date;
+import java.util.Random;
 
 
 public class Injection extends InspectionApplicationTests{
@@ -31,19 +35,31 @@ public class Injection extends InspectionApplicationTests{
 
 
     @Test
-    public void deleteUser(){
-        User user = new User();
-        user.setUserId(199);
-        user.deleteById();
+    public void injectDamage(){
+
+        Damage damage = new Damage();
+        Random r = new Random();
+
+        long basedate = 1635585409000L;
+        for(int i = 0; i < 1000; i++){
+            damage.setPostUser(r.nextInt(199) + 1);
+            damage.setDamageType(r.nextInt(3));
+            damage.setRailway(0);
+            damage.setDamageLevel(1);
+            damage.setLocation("106.14568785951,65.2565478256");
+            damage.setStatus(r.nextInt(2) + 1);
+            long date = basedate - r.nextInt(1419200000);
+            damage.setPostDate(new Date(date));
+            damage.insert();
+            System.out.print(i + " ");
+        }
+
+
     }
-
-
     @Test
-    public void updateUser(){
-        User user = new User();
-        user.setUserId(1);
-        user.setUserPassword("123");
-        user.updateById();
+    public void timeTest(){
+        Date date = new Date(1635585409000L);
+        System.out.println(date);
     }
 
 

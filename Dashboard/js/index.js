@@ -816,13 +816,13 @@ function manage(){
                     radius : '55%',
                     center: ['50%', '60%'],
                     data:[
-                        {value:90, name:'男性',
+                        {value:3, name:'男性',
                             itemStyle:{
                                 normal:{
                                     color:"#2865aa"
                                 }
                             }},
-                        {value:10, name:'女性',
+                        {value:50, name:'女性',
                             itemStyle:{
                                 normal:{
                                     color:"#ff81cb"
@@ -832,8 +832,6 @@ function manage(){
                 }
             ]
         };
-
-
 
         myChart.setOption(option);
     });
@@ -3616,5 +3614,3 @@ function AnQuan(){
         myChart.setOption(option);
     });
 }
-
-
