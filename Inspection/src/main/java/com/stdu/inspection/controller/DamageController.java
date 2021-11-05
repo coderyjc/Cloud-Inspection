@@ -39,13 +39,13 @@ public class DamageController {
      * @return 返回当日的损伤列表
      */
     @RequestMapping(value = "/damageTodayList", method = RequestMethod.GET)
-    public Msg GetDamageTodayList(
+    public Msg listDamageToday(
             @RequestParam(value = "time") String time,
             @RequestParam(value = "pn") String pn,
             @RequestParam(value = "limit") String limit
     )
     {
-        IPage<Damage> damageTodayList = damageService.damageTodayList(time,pn, limit);
+        IPage<Damage> damageTodayList = damageService.listDamageToday(time,pn, limit);
         return Msg.success().add("damageTodayList",damageTodayList);
     }
 

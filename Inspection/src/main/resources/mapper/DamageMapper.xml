@@ -19,8 +19,14 @@
     <sql id="Base_Column_List">
         id, post_user, damage_type, railway, damage_level, location, description, post_date, status
     </sql>
-    <select id="selectDamageConut" resultType="java.lang.Integer">
-        select count(*) from damage
-    </select>
 
+    <sql id="Damage_Damage_type_Column_List">
+        id, post_user, railway, location, description, post_date, status, type_name,type_description,damage_type_id
+    </sql>
+
+
+    <select id="listDamageToday" resultType="com.stdu.inspection.pojo.DamageDamageType">
+        select <include refid="Damage_Damage_type_Column_List" />
+        from v_damage_damage_type #{wrapper.customSqlSegment};
+    </select>
 </mapper>

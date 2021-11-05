@@ -38,15 +38,11 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
      * @return
      */
     @Override
-    public IPage<Damage> damageTodayList(String time, String pn, String limit) {
-
-        Date date = TimeUtils.castDateStringToDateTypeYMD(time);   // 将形式为YYYY-mm-dd 转换为 Date类型
+    public IPage<Damage> listDamageToday(String time, String pn, String limit) {
 
         QueryWrapper<Damage> wrapper = new QueryWrapper<Damage>();
-
-        System.out.println(date);
         IPage<Damage> iPage = new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
         wrapper.apply("date_format(post_date,'%Y-%m-%d') = '" + time+ "' ");
-        return damageMapper.selectPage(iPage,wrapper);
+        return baseMapper.listDamageToday(iPage,wrapper);
     }
 }

@@ -15,5 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface DamageService extends IService<Damage> {
 
 
-    IPage<Damage> damageTodayList(String time, String pn, String limit) ;
+    IPage<Damage> listDamageToday(String time, String pn, String limit) ;
 }
