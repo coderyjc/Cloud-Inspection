@@ -25,6 +25,21 @@ public class TaskController {
     @Autowired
     TaskService taskService;
 
+    /**
+     * 根据时间查询今日总任务数量（检查量）
+     * @param time
+     * @return
+     * 2021年11月7日23:25:30
+     */
+    @RequestMapping(value = "/taskCountToday", method = RequestMethod.GET)
+    public Msg getTaskCountToday(
+            @RequestParam(value = "time") String time
+    )
+    {
+        Integer taskCountToday = taskService.getTaskCountByTime(time);
+        return Msg.success().add("taskCountToday",taskCountToday);
+    }
+
     @RequestMapping(value = "/process", method = RequestMethod.GET)
     public Msg getTaskProcessById(
             @RequestParam(value = "taskid") String taskId

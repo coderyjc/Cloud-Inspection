@@ -33,4 +33,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         wrapper.eq("status", status);
         return baseMapper.listTaskByProcess(iPage, wrapper);
     }
+
+    @Override
+    public Integer getTaskCountByTime(String time) {
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        wrapper.like("receive_date",time);
+        Integer count = baseMapper.selectCount(wrapper);
+        return count;
+    }
 }

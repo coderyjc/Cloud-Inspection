@@ -18,4 +18,12 @@ public interface TaskService extends IService<Task> {
     TaskProcess getTaskProcessById(String taskId);
 
     IPage<TaskProcess> listTaskByProcess(String status, String pn, String limit);
+
+    /**
+     * 2021年11月7日23:32:31
+     * 根据日期查询某天任务总数
+     * @param time
+     * @return
+     */
+    Integer getTaskCountByTime(String time);
 }
