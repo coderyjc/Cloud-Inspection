@@ -37,10 +37,10 @@ public class DamageController {
     /**对应   实时监测-实时数据右2 今日损伤列表
      *
      * @param  time 前端传过来的字符串类型的时间
-     * @return 返回当日的损伤列表
+     * @return 返回日的损伤列表
      */
 
-    @RequestMapping(value = "/damageTodayList", method = RequestMethod.GET)
+    @RequestMapping(value = "/listDamageToday", method = RequestMethod.GET)
     public Msg listDamageToday(
             @RequestParam(value = "time") String time,
             @RequestParam(value = "pn") String pn,
@@ -49,6 +49,20 @@ public class DamageController {
     {
         IPage<DamageDamageType> damageTodayList = damageService.listDamageToday(time, pn, limit);
         return Msg.success().add("damageTodayList",damageTodayList);
+    }
+
+    /**
+     * 当日发现的损伤和当日已经维修好的损伤数量
+     * @param time
+     * @return 日损伤修复数量
+     */
+    @RequestMapping(value = "getDamageCompleteCount", method = RequestMethod.GET)
+    public Msg getDamageCompleteCount(
+            @RequestParam(value = "time")String time
+    )
+    {
+        Integer damageCompleteCount = damageService.getDamageCompleteCount(time);
+        return Msg.success().add("damageCompleteCount",damageCompleteCount);
     }
 
 }

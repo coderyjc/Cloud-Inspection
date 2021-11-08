@@ -16,5 +16,19 @@ import com.stdu.inspection.pojo.DamageDamageType;
 public interface DamageService extends IService<Damage> {
 
 
+    /**
+     * 根据时间获取日损伤列表
+     * @param time
+     * @param pn
+     * @param limit
+     * @return list集合 日损伤列表
+     */
     IPage<DamageDamageType> listDamageToday(String time, String pn, String limit) ;
+
+    /**
+     * 根据时间获得日损伤完成数量
+     * @param time
+     * @return 整数 日损伤修复数量
+     */
+    Integer getDamageCompleteCount(String time);
 }

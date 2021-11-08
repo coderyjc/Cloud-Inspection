@@ -43,4 +43,19 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
 //        wrapper.apply("date_format(post_date,'%Y-%m-%d') = '" + time+ "' ");
         return baseMapper.listDamageToday(iPage,time);
     }
+
+    /**
+     *
+     *
+     * 通过时间yyyy-mm-dd来获取当日的损伤完成数量
+     * @param time
+     * @return
+     */
+    @Override
+    public Integer getDamageCompleteCount(String time) {
+        QueryWrapper<Damage> damageCompleteQueryWrapper = new QueryWrapper<Damage>();
+        damageCompleteQueryWrapper.like("fixed_date",time);
+
+        return baseMapper.selectCount(damageCompleteQueryWrapper);
+    }
 }

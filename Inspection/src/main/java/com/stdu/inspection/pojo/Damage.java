@@ -78,5 +78,10 @@ public class Damage extends Model<Damage> {
      */
     private Integer status;
 
+    /**
+     * 损伤修复日期
+     */
+    private Date fixedDate;
+
 
 }

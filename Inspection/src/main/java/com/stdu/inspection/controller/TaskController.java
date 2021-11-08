@@ -27,6 +27,7 @@ public class TaskController {
 
     /**
      * 根据时间查询今日总任务数量（检查量）
+     * 对接 实时监测-实时数据界面 右上角的每日检查量
      * @param time
      * @return
      * 2021年11月7日23:25:30
