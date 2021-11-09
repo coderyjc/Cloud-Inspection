@@ -18,7 +18,6 @@ import java.io.IOException;
  */
 public class FileUtil {
 
-
     /**
      * 保存图片到指定文件夹
      *

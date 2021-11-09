@@ -37,10 +37,7 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
 
     @Override
     public IPage<DamageDamageType> listDamageToday(String time, String pn, String limit) {
-
-//        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<DamageDamageType>();
         IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
-//        wrapper.apply("date_format(post_date,'%Y-%m-%d') = '" + time+ "' ");
         return baseMapper.listDamageToday(iPage,time);
     }
 
@@ -55,7 +52,6 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
     public Integer getDamageCompleteCount(String time) {
         QueryWrapper<Damage> damageCompleteQueryWrapper = new QueryWrapper<Damage>();
         damageCompleteQueryWrapper.like("fixed_date",time);
-
         return baseMapper.selectCount(damageCompleteQueryWrapper);
     }
 }

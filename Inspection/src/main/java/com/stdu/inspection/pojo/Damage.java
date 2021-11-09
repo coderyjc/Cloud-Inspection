@@ -84,4 +84,9 @@ public class Damage extends Model<Damage> {
     private Date fixedDate;
 
 
+    /**
+     * 上报来源，说明上报的是人还是车
+     */
+    private Integer postSource;
+
 }
