@@ -52,7 +52,7 @@ public class DamageController {
     }
 
     /**
-     * 当日发现的损伤和当日已经维修好的损伤数量
+     * 当日发现的 损伤和当日已经维修好的损伤数量
      * @param time
      * @return 日损伤修复数量
      */
