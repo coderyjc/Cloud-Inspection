@@ -54,11 +54,6 @@ public class Damage extends Model<Damage> {
     private Integer railway;
 
     /**
-     * 损伤等级，这个如果能识别出来最好，没有就删了
-     */
-    private Integer damageLevel;
-
-    /**
      * 经纬度
      */
     private String location;
@@ -83,5 +78,10 @@ public class Damage extends Model<Damage> {
      */
     private Date fixedDate;
 
+
+    /**
+     * 上报来源，说明上报的是人还是车
+     */
+    private Integer postSource;
 
 }

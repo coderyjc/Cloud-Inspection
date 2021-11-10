@@ -1,3 +1,6 @@
+jar:
+  fileUrl: C:/Users/Administrator/Pictures/webstatic
+
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -15,14 +18,14 @@ spring:
       suffix: .html
   web:
     resources:
-      static-locations: classpath:/templates/,classpath:/static/
+      static-locations: file:${jar.fileUrl},classpath:/static/,
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
 
 server:
-  port: 8080
+  port: 8081
   max-http-header-size: 1MB
 
 logging:

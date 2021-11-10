@@ -8,22 +8,24 @@
         <result column="post_user" property="postUser" />
         <result column="damage_type" property="damageType" />
         <result column="railway" property="railway" />
-        <result column="damage_level" property="damageLevel" />
         <result column="location" property="location" />
         <result column="description" property="description" />
         <result column="post_date" property="postDate" />
         <result column="status" property="status" />
+        <result column="fixed_date" property="fixedDate"/>
+        <result column="post_source" property="postSource"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, post_user, damage_type, railway, damage_level, location, description, post_date, status
+        id, post_user, damage_type, railway, location, description, post_date,
+        status, fixed_date, post_source
     </sql>
 
     <sql id="Damage_Damage_type_Column_List">
-        id, post_user, railway, location, description, post_date, status, type_name,type_description,damage_type_id
+        id, post_user, railway, location, description, post_date, status, type_name,
+        type_description, damage_type_id
     </sql>
-
 
     <select id="listDamageToday" resultType="com.stdu.inspection.pojo.DamageDamageType">
         select <include refid="Damage_Damage_type_Column_List" />
