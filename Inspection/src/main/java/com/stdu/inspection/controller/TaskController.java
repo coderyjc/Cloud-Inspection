@@ -70,7 +70,14 @@ public class TaskController {
     }
 
 
+    @RequestMapping(value = "/user/status")
+    public Msg getUserTaskStatusCountToday(
+        @RequestParam(value = "userId") String id
+    ){
 
+
+        return Msg.success();
+    }
 
 
 }
