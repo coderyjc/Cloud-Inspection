@@ -7,17 +7,23 @@
 
 package com.stdu.inspection;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.stdu.inspection.pojo.Damage;
+import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.User;
 import com.stdu.inspection.utils.MD5Util;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 
 public class Injection extends InspectionApplicationTests{
 
+    /**
+     * 随机注入用户
+     */
     @Test
     public void injectUser(){
         User user = new User();
@@ -33,7 +39,9 @@ public class Injection extends InspectionApplicationTests{
         }
     }
 
-
+    /**
+     * 随机注入损伤数据
+     */
     @Test
     public void injectDamage(){
 
@@ -45,7 +53,6 @@ public class Injection extends InspectionApplicationTests{
             damage.setPostUser(r.nextInt(199) + 1);
             damage.setDamageType(r.nextInt(3));
             damage.setRailway(0);
-            damage.setDamageLevel(1);
             damage.setLocation("106.14568785951,65.2565478256");
             damage.setStatus(r.nextInt(2) + 1);
             long date = basedate - r.nextInt(1419200000);
@@ -56,13 +63,34 @@ public class Injection extends InspectionApplicationTests{
 
 
     }
+
+    /**
+     * 把Damage表中的正在修复的数据注入到Task中
+     */
     @Test
-    public void timeTest(){
-        Date date = new Date(1635585409000L);
-        System.out.println(date);
+    public void injectTask(){
+        QueryWrapper<Damage> wrapper = new QueryWrapper<>();
+        // 2表示已接受
+        wrapper.eq("status", "2");
+        Damage damage = new Damage();
+        List<Damage> damages = damage.selectList(wrapper);
+        // 构建任务对象
+        Random random = new Random();
+        Task task = new Task();
+        task.setTaskId(null);
+        Date now = new Date();
+        int i = 1;
+        for (Damage item : damages) {
+            task.setStatus(random.nextInt(3) + 2);
+            task.setDamageId(item.getId());
+            task.setReceiver(random.nextInt(195) + 1);
+            task.setReceiveDate(item.getPostDate());
+            task.setDeadline(now);
+            task.insert();
+            System.out.print(i++);
+        }
+
     }
-
-
 
 }
 

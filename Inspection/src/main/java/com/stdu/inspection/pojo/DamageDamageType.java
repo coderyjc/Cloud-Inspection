@@ -56,6 +56,9 @@ public class DamageDamageType {
      */
     private  String typeDescription;
 
+    /**
+     * 损伤类型id
+     */
     private Integer damageTypeId;
 
 }

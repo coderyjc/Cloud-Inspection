@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -48,12 +49,12 @@ public class Task extends Model<Task> {
     /**
      * 接受任务的时间
      */
-    private LocalDateTime receiveDate;
+    private Date receiveDate;
 
     /**
      * 截止日期
      */
-    private LocalDateTime deadline;
+    private Date deadline;
 
     /**
      * 任务状态 1234

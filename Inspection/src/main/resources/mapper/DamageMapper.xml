@@ -8,7 +8,6 @@
         <result column="post_user" property="postUser" />
         <result column="damage_type" property="damageType" />
         <result column="railway" property="railway" />
-        <result column="damage_level" property="damageLevel" />
         <result column="location" property="location" />
         <result column="description" property="description" />
         <result column="post_date" property="postDate" />
@@ -19,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, post_user, damage_type, railway, damage_level, location, description, post_date,
+        id, post_user, damage_type, railway, location, description, post_date,
         status, fixed_date, post_source
     </sql>
 
