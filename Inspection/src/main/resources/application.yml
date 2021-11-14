@@ -25,9 +25,12 @@ spring:
       max-request-size: 50MB
 
 server:
-  port: 8081
+  port: 8086
   max-http-header-size: 1MB
 
 logging:
   level:
-    com.jancoyan.jancoblog.mapper: debug
+    com.stdu.inspection.mapper.: debug
+
+
+

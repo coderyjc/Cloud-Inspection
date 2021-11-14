@@ -58,5 +58,24 @@ public class DamageController {
         return Msg.success().add("damageCompleteCount",damageCompleteCount);
     }
 
+    /**
+     * 获取当前已有损伤列表
+     * 2021年11月11日22:52:52
+     * @param pn
+     * @param limit
+     * @return
+     */
+    @RequestMapping(value = "/listDamageUptoNow")
+    public Msg listDamageUptoNow(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit")String limit
+    )
+    {
+        IPage<DamageDamageType> listDamageUptoNow = damageService.listDamageUptoNow(pn, limit);
+
+        return Msg.success().add("listDamageUptoNow",listDamageUptoNow);
+
+    }
+
 }
 

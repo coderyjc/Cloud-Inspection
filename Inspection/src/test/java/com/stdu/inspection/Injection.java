@@ -12,6 +12,7 @@ import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.User;
 import com.stdu.inspection.utils.MD5Util;
+import com.stdu.inspection.utils.TimeUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -90,6 +91,13 @@ public class Injection extends InspectionApplicationTests{
             System.out.print(i++);
         }
 
+    }
+    @Test
+    public void testTime()
+    {
+        Date today = new Date();  //  默认截止日期是今天
+        String s = TimeUtils.castDateTypeToDateString((today));
+        System.out.println(s);
     }
 
 }

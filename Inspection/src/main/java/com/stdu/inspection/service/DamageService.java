@@ -31,4 +31,13 @@ public interface DamageService extends IService<Damage> {
      * @return 整数 日损伤修复数量
      */
     Integer getDamageCompleteCount(String time);
+
+    /**
+     * 2021年11月11日22:54:21
+     * 获取当前已有损伤列表
+     * @param pn
+     * @param limit
+     * @return
+     */
+    IPage<DamageDamageType> listDamageUptoNow(String pn, String limit);
 }

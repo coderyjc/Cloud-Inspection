@@ -1,5 +1,6 @@
 package com.stdu.inspection.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,8 +9,12 @@ import com.stdu.inspection.mapper.DamageMapper;
 import com.stdu.inspection.pojo.DamageDamageType;
 import com.stdu.inspection.service.DamageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.stdu.inspection.utils.TimeUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -54,4 +59,25 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
         damageCompleteQueryWrapper.like("fixed_date",time);
         return baseMapper.selectCount(damageCompleteQueryWrapper);
     }
+
+    /**
+     * 获取当前已有损伤列表
+     * @param pn
+     * @param limit
+     * @return
+     */
+
+    @Override
+    public IPage<DamageDamageType> listDamageUptoNow(String pn, String limit) {
+
+        IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
+        String time = TimeUtils.getCurrentTimeString(); // 获取当前系统时间，格式为 yyyy-MM-dd HH:mm:ss
+
+//        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<DamageDamageType>();
+//        wrapper.apply("UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('"+time+"')");
+//        System.out.println("UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('"+tadayS+"')");
+
+        return baseMapper.listDamageUptoNow(iPage,time);
+    }
 }
+// select * from v_damage_damage_type where  UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('2021-11-13 00:14:32')
