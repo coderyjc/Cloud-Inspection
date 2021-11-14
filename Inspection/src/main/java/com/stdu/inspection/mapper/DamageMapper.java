@@ -26,4 +26,6 @@ public interface DamageMapper extends BaseMapper<Damage> {
     IPage<DamageDamageType> listDamageToday(IPage<DamageDamageType> iPage,@Param("time") String time);
 
     IPage<DamageDamageType> listDamageUptoNow(IPage<DamageDamageType> iPage,@Param("time") String time);
+
+    DamageDamageType getDamageById(@Param(Constants.WRAPPER) QueryWrapper<DamageDamageType> wrapper);
 }

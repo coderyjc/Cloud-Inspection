@@ -40,4 +40,11 @@ public interface DamageService extends IService<Damage> {
      * @return
      */
     IPage<DamageDamageType> listDamageUptoNow(String pn, String limit);
+
+    /**获取单个损伤的详情信息
+     * 2021年11月14日23:11:36
+     * @param damageId
+     * @return
+     */
+    DamageDamageType getDamageById(String damageId);
 }

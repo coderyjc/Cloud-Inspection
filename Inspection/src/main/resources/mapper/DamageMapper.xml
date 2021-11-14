@@ -47,4 +47,9 @@
         UNIX_TIMESTAMP(post_date) &lt;  UNIX_TIMESTAMP(#{time})
 
     </select>
+
+    <select id="getDamageById" resultType="com.stdu.inspection.pojo.DamageDamageType">
+        select <include refid="Damage_Damage_type_Column_List" /> from v_damage_damage_type
+            ${ew.customSqlSegment}
+    </select>
 </mapper>
