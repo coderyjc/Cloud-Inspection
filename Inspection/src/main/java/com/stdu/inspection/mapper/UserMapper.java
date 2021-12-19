@@ -2,6 +2,7 @@ package com.stdu.inspection.mapper;
 
 import com.stdu.inspection.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+    Integer selectCountUserDayTask(@Param("id") Integer id, @Param("date") String date, @Param("status") int status);
 }
