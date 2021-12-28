@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stdu.inspection.pojo.User;
 import com.stdu.inspection.mapper.UserMapper;
+import com.stdu.inspection.pojo.vUserDayTask;
 import com.stdu.inspection.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stdu.inspection.utils.MD5Util;
+import com.stdu.inspection.utils.TimeUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,5 +36,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.eq("user_password", MD5Util.getMD5(password));
         User user = baseMapper.selectOne(wrapper);
         return user != null;
+    }
+
+    @Override
+    public vUserDayTask userDayTaskStatus(String id, String date) {
+
+        Integer ID = Integer.parseInt(id);
+
+
+        //selectCountUserDayTask的参数对应 用户id，日期，任务状态
+        Integer countReceive = baseMapper.selectCountUserDayTask(ID,date, 2);
+        Integer countCheck =  baseMapper.selectCountUserDayTask(ID,date, 3);
+        Integer countComplete =  baseMapper.selectCountUserDayTask(ID,date, 4);
+
+        vUserDayTask vUserDayTask = new vUserDayTask();
+        vUserDayTask.setId(ID);
+//        vUserDayTask.setDate(TimeUtils.castDateStringToDateTypeYMD(date));
+        vUserDayTask.setCountReceive(countReceive);
+        vUserDayTask.setCountCheck(countCheck);
+        vUserDayTask.setCountComplete(countComplete);
+
+        System.out.println(vUserDayTask);
+
+        return vUserDayTask;
     }
 }

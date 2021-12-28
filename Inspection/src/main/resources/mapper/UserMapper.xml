@@ -15,4 +15,10 @@
         user_id, user_name, user_password, user_role
     </sql>
 
+    <select id="selectCountUserDayTask" resultType="java.lang.Integer">
+        select count(*) from v_user_day_task where receiver = (#{id}) and receive_date like concat('%','${date}', '%')
+            and status = (#{status})
+
+    </select>
+
 </mapper>

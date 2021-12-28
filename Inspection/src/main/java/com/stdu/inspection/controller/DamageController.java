@@ -77,5 +77,19 @@ public class DamageController {
 
     }
 
+    /**获取单个损伤的详情信息
+     * 2021年11月14日23:11:02
+     * @param damageId
+     * @return DamageDamageType视图
+     */
+    @RequestMapping(value = "/getDamageById")
+    public Msg getDamageById(
+            @RequestParam(value = "damageId")String damageId
+    )
+    {
+        DamageDamageType getDamageById = damageService.getDamageById(damageId);
+        return Msg.success().add("getDamageById",getDamageById);
+    }
+
 }
 

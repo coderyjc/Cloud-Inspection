@@ -79,5 +79,16 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
 
         return baseMapper.listDamageUptoNow(iPage,time);
     }
+
+    /**
+     * 获取单个损伤的详情信息
+     * @param damageId
+     * @return
+     */
+    @Override
+    public DamageDamageType getDamageById(String damageId) {
+        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<DamageDamageType>();
+        wrapper.eq("id", Integer.parseInt(damageId));
+        return baseMapper.getDamageById(wrapper);
+    }
 }
-// select * from v_damage_damage_type where  UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('2021-11-13 00:14:32')

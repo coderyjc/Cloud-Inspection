@@ -3,6 +3,7 @@ package com.stdu.inspection.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.User;
+import com.stdu.inspection.pojo.vUserDayTask;
 import com.stdu.inspection.service.UserService;
 import com.stdu.inspection.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,20 @@ public class UserController {
         return Msg.success().add("suc", suc);
     }
 
+
+    /**
+     * 获取用户【今日】任务统计信息
+     *
+     */
+    @RequestMapping(value = "/userDayTaskStatus", method = RequestMethod.GET)
+    public Msg userTaskList(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "date") String date
+    )
+    {
+       vUserDayTask vUserDayTask = userService.userDayTaskStatus(id, date);
+       return Msg.success().add("userDayTaskStatus", vUserDayTask);
+    }
 
 
 
