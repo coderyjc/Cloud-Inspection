@@ -1,0 +1,186 @@
+{
+	"easycom": {
+		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "云巡检"
+			}
+		},
+		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		}
+        ,{
+            "path" : "pages/home/login",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "登录"
+            }
+        }
+        ,{
+            "path" : "pages/home/settings",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "设置"
+            }
+        }
+        ,{
+            "path" : "pages/home/history",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "历史任务"
+            }
+        }
+        ,{
+            "path" : "pages/task/postDamage",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "报告损伤",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/progress",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "工作进度",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/damage/damageDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "任务详情",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/result/completeRepair",
+            "style" :                                                     
+            {
+                "navigationBarTitleText": "任务已完成",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/operation/submitTask",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "提交任务",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/operation/cancelTask",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "取消任务",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/result/cancelRepair",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "放弃任务",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/operation/delayTask",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "申请延时",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/task",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "任务列表",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/task/record",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "工单汇总"
+            }
+        }
+        ,{
+            "path" : "pages/task/alert",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "损伤报警"
+            }
+        }
+        ,{
+            "path" : "pages/task/today/outOfTime",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "超时工单"
+            }
+        }
+        ,{
+            "path" : "pages/task/today/toDo",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "待提交"
+            }
+        }
+        ,{
+            "path" : "pages/task/today/complete",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "已完成"
+            }
+        },
+		{
+			"path": "uview-ui/components/u-avatar-cropper/u-avatar-cropper",
+			"style": {
+				"navigationBarTitleText": "头像裁剪",
+				"navigationBarBackgroundColor": "#000000"
+			}
+		}
+    ],
+	"globalStyle": {
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#3DB0FC",
+		"navigationBarTextStyle":"white",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#5098ff",
+		"borderStyle": "white",
+		"backgroundColor": "#F8F8F8",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/icon/home.png",
+				"selectedIconPath": "static/icon/home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/task/task",
+				"iconPath": "static/icon/list.png",
+				"selectedIconPath": "static/icon/list-active.png",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/home/home",
+				"iconPath": "static/icon/member.png",
+				"selectedIconPath": "static/icon/member-active.png",
+				"text": "个人中心"
+			}
+		]
+	}
+}
