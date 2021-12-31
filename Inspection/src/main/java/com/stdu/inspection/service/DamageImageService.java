@@ -3,6 +3,8 @@ package com.stdu.inspection.service;
 import com.stdu.inspection.pojo.DamageImage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -21,4 +23,11 @@ public interface DamageImageService extends IService<DamageImage> {
      * @return
      */
     int modifyDamageId(Integer postId, int damageId);
+
+    /**
+     * 由损伤的损伤id获取损伤对应的图片列表
+     * @param damageId 损伤id
+     * @return 图片列表
+     */
+    List<DamageImage> listImageByDamageId(String damageId);
 }

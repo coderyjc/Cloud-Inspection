@@ -26,6 +26,7 @@ public class FileUtil {
      */
     public static void savePicture(MultipartFile file, String destDir, String filename) {
         if (file != null) {
+
             //目标文件路径值
             String destPath = destDir + "/" + filename;
             File dest = new File(destPath);
@@ -40,6 +41,8 @@ public class FileUtil {
 
         }
     }
+
+
 
 
 }

@@ -37,4 +37,12 @@ public class DamageImageServiceImpl extends ServiceImpl<DamageImageMapper, Damag
 
         return 1;
     }
+
+    @Override
+    public List<DamageImage> listImageByDamageId(String damageId) {
+        DamageImage image = new DamageImage();
+        QueryWrapper<DamageImage> wrapper = new QueryWrapper<>();
+        wrapper.eq("damage_id", damageId);
+        return image.selectList(wrapper);
+    }
 }

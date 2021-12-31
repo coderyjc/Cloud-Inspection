@@ -7,7 +7,6 @@
 
 package com.stdu.inspection.config;
 
-import com.stdu.inspection.utils.ConstUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -24,10 +23,9 @@ public class MvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String location = "file:" + ConstUtil.DAMAGE_PICTURE;
         registry.
                 addResourceHandler("/static/**").
-                addResourceLocations("classpath:/static/", location);
+                addResourceLocations("classpath:/static/", "file:C:/Users/Administrator/Pictures/webstatic/");
     }
 
 
