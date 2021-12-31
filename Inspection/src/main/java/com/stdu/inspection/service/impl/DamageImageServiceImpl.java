@@ -1,10 +1,13 @@
 package com.stdu.inspection.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.mapper.DamageImageMapper;
 import com.stdu.inspection.service.DamageImageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class DamageImageServiceImpl extends ServiceImpl<DamageImageMapper, DamageImage> implements DamageImageService {
 
+
+    @Override
+    public int modifyDamageId(Integer postId, int damageId) {
+        // 将update_id为postId 的记录指定damageid
+        QueryWrapper<DamageImage> wrapper = new QueryWrapper<>();
+        wrapper.eq("update_id", postId);
+        DamageImage damageImage = new DamageImage();
+        List<DamageImage> list = damageImage.selectList(wrapper);
+        // 执行更新操作
+        for (DamageImage item : list) {
+            item.setDamageId(damageId);
+            item.setUpdateId(0);
+            item.updateById();
+        }
+
+        return 1;
+    }
 }

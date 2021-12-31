@@ -47,4 +47,16 @@ public interface DamageService extends IService<Damage> {
      * @return
      */
     DamageDamageType getDamageById(String damageId);
+
+    /**
+     * 插入损伤数据
+     * @param location 位置
+     * @param type 类型
+     * @param postId 上传id
+     * @param source 上传的是人还是车
+     * @param description 介绍说明
+     * @return 损伤id
+     */
+    int insert(String location, Integer type, Integer postId, Integer source, String description);
+
 }

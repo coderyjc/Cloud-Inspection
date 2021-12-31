@@ -13,4 +13,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DamageImageService extends IService<DamageImage> {
 
+
+    /**
+     * 将表中的updateid为postid的主键值都改成damageid
+     * @param postId 上传者的id
+     * @param damageId 损伤id
+     * @return
+     */
+    int modifyDamageId(Integer postId, int damageId);
 }

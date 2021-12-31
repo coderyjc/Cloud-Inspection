@@ -44,9 +44,7 @@ public class TestGenerator{
         StrategyConfig strategyConfig = new StrategyConfig();
         strategyConfig.setTablePrefix("")
                 .setColumnNaming(NamingStrategy.underline_to_camel)
-                .setInclude("user")
-                .setInclude("damage")
-                .setInclude("task");
+                .setInclude("damage_image");
 
 //        包名策略配置
         PackageConfig packageConfig = new PackageConfig();

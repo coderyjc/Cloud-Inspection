@@ -91,4 +91,27 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
         wrapper.eq("id", Integer.parseInt(damageId));
         return baseMapper.getDamageById(wrapper);
     }
+
+    @Override
+    public int insert(String location, Integer type, Integer postId, Integer source, String description) {
+
+        Damage damage = new Damage();
+        damage.setId(null);
+        damage.setDamageType(type);
+        damage.setStatus(0);
+        damage.setLocation(location);
+        damage.setPostUser(postId);
+        damage.setPostDate(new Date());
+        damage.setDescription(description);
+        damage.setPostSource(source);
+        damage.setFixedDate(null);
+        damage.insert();
+
+//        这里是个性能比较差的地方，先插进去数据，再拿出来看看id，比较费时间，但也只能这样了。
+        QueryWrapper<Damage> queryWrapper  = new QueryWrapper<>();
+        queryWrapper.eq("location", location);
+        queryWrapper.eq("post_user", postId);
+        damage = damage.selectOne(queryWrapper);
+        return damage.getId();
+    }
 }

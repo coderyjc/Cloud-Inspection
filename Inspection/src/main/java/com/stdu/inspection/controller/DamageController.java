@@ -2,7 +2,10 @@ package com.stdu.inspection.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.pojo.DamageDamageType;
+import com.stdu.inspection.pojo.DamageImage;
+import com.stdu.inspection.service.DamageImageService;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -25,6 +30,9 @@ public class DamageController {
 
     @Autowired
     DamageService damageService;
+
+    @Autowired
+    DamageImageService imageService;
 
     /**
      * 实时监测-实时数据右2 今日损伤列表
@@ -72,9 +80,7 @@ public class DamageController {
     )
     {
         IPage<DamageDamageType> listDamageUptoNow = damageService.listDamageUptoNow(pn, limit);
-
         return Msg.success().add("listDamageUptoNow",listDamageUptoNow);
-
     }
 
     /**获取单个损伤的详情信息
@@ -89,6 +95,42 @@ public class DamageController {
     {
         DamageDamageType getDamageById = damageService.getDamageById(damageId);
         return Msg.success().add("getDamageById",getDamageById);
+    }
+
+
+    /**
+     * 【上传损伤】
+     * 前提：上传损伤的时候带有图片，每个损伤的每个图片是记录在【damage_image】表中的。
+     *  提交损伤的人员在报告损伤的时候上传了图片，但是这时候图片的【damage_id】字段没有指定
+     *  设置 damage_image 表中的 damage_id 应该在插入damage之后进行
+     * 我实现的逻辑是这样的：
+     *  在damage_image中创建字段 update_id
+     *  表在工人发现损伤，在报告损伤界面插入图片的时候，向damage_image插入数据时将【暂时】update_id 置为user_id
+     *  在获得damage_id之后，再将updateid=user_id 的记录的 damage_id 改为刚刚获得的damageid，并且将update_id=0
+     * @param type 损伤类型
+     * @param location 损伤所在的经纬度
+     * @param postId 上传损伤者的id
+     * @param description 对损伤的描述
+     * @param source 上传损伤的是人还是设备
+     * @return 成功和失败的消息
+     */
+    @RequestMapping(value = "post", method = RequestMethod.POST)
+    public Msg insertDamage(
+            String location,
+            Integer type,
+            Integer postId,
+            Integer source,
+            String description
+            ){
+
+        // 返回损伤类型号
+        int damageId =
+                damageService.insert(location, type, postId, source, description);
+
+        // 格式化损伤类型号
+        int suc = imageService.modifyDamageId(postId, damageId);
+
+        return Msg.success().add("suc", suc);
     }
 
 }
