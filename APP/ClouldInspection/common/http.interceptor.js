@@ -2,7 +2,7 @@ const install = (Vue, vm) => {
 	// 此为自定义配置参数，具体参数见上方说明
 	Vue.prototype.$u.http.setConfig({
 		// baseUrl: 'http://101.201.64.102:9090',
-		baseUrl: 'http://localhost:8080',
+		baseUrl: 'http://localhost:8086',
 		loadingText: '努力加载中~',
 		loadingTime: 800,
 		// 设置自定义头部content-type
@@ -27,7 +27,7 @@ const install = (Vue, vm) => {
 	
 	// 响应拦截，判断状态码是否通过
 	Vue.prototype.$u.http.interceptor.response = (res) => {
-		if(res.code == 0) {
+		if(res.code == 100) {
 			// 请求成功，后端返回 0
 			return res.extend;
 		} else {

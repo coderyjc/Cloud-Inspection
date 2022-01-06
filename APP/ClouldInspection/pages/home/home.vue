@@ -2,18 +2,17 @@
 	<view>
 		<u-modal v-model="avatarConfirm" content="修改头像？" @confirm="nav_changeAvatar" show-cancel-button></u-modal>
 
-		<view class="u-flex user-box u-p-l-30 u-p-r-20 u-p-b-30" v-if="userIsLogin" @click="userDetails">
+		<view class="u-flex user-box u-p-l-30 u-p-r-20 u-p-b-30 u-p-t-20" @click="nav_login">
 			<view class="u-m-r-30">
-				<u-avatar @click="chooseAvatar" src="../../static/logo/default-navatur.png" :show-level="false"
+				<u-avatar @click="chooseAvatar" :src="userAvatar" :show-level="false"
 					size="140"></u-avatar>
 			</view>
 			<view class="u-flex-1">
-				<view class="u-font-18 u-p-b-25">用户名</view>
-				<view class="u-font-14 u-tips-color">ID: 10000</view>
+				<view class="u-font-18 u-p-b-25"> {{ (userIsLogin && userInfo.userName) || '点击登录' }}</view>
 			</view>
 		</view>
 
-		<view class="grid">
+		<view class="grid" v-if="userIsLogin">
 			<UserOperationGrid></UserOperationGrid>
 		</view>
 
@@ -28,13 +27,19 @@
 		},
 		data() {
 			return {
-				userIsLogin: true,
+				userAvatar: '../../static/logo/default-navatur.png',
+				userIsLogin: false,
 				userInfo: {},
 				avatarConfirm: false
 			}
 		},
 		onShow() {
-
+			let user = uni.getStorageSync('user')
+			if(null != user && "" != user && undefined != user){
+				this.userIsLogin = true
+				this.userInfo = user
+				this.userAvatar = this.$u.api.userAvatar(this.userInfo.userId)
+			}
 		},
 		methods: {
 			nav_changeAvatar() {
@@ -53,9 +58,16 @@
 				})
 			},
 			chooseAvatar() {
+				if(!this.userIsLogin) return
 				// 此为uView的跳转方法，详见"文档-JS"部分，也可以用uni的uni.navigateTo
 				this.avatarConfirm = true
 			},
+			nav_login(){
+				if(this.userIsLogin) return
+				uni.navigateTo({
+					url: '/pages/home/login'
+				})
+			}
 		}
 	}
 </script>

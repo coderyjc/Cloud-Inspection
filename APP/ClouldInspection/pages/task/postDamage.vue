@@ -113,7 +113,7 @@
 				uni.getLocation({
 					type: 'gcj02',
 				 success: function(res) {
-						that.buttonText = "114.484118 37.99296"
+						that.buttonText = "获取不到位置"
 					}
 				});
 			},
@@ -130,6 +130,7 @@
 				this.$refs.uUpload.clear();
 			},
 			upload() {
+				
 				this.$refs.uUpload.upload();
 			},
 			deleteItem(index) {
