@@ -30,12 +30,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean login(String userName, String password) {
+    public User login(String userId, String password) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_name", userName);
+        wrapper.eq("user_id", userId);
         wrapper.eq("user_password", MD5Util.getMD5(password));
         User user = baseMapper.selectOne(wrapper);
-        return user != null;
+        return user;
     }
 
     @Override

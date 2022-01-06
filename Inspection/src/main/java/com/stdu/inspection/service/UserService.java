@@ -16,14 +16,21 @@ import com.stdu.inspection.pojo.vUserDayTask;
 public interface UserService extends IService<User> {
 
     /**
-     *
+     * 列出所有用户列表
      * @param pn
      * @param limit
      * @return
      */
     IPage<User> listAll(String pn, String limit);
 
-    boolean login(String userName, String password);
+
+    /**
+     * 登录
+     * @param userId 用户id
+     * @param password 密码
+     * @return
+     */
+    User login(String userId, String password);
 
     /**
      * 获取用户【今日】的任务统计信息

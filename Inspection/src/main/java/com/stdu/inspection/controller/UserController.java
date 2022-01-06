@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class UserController {
 
-
     @Autowired
     UserService userService;
 
@@ -44,20 +43,20 @@ public class UserController {
     }
 
     /**
-     * 登录
-     * @param userName 用户名
+     * 用户登录
+     * 返回登录成功还是失败，如果成功，返回用户信息
+     * @param userId 用户名
      * @param password 密码
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public Msg login(
-        @RequestParam(value = "username") String userName,
+        @RequestParam(value = "id") String userId,
         @RequestParam(value = "pwd") String password
     ){
-        boolean suc = userService.login(userName, password);
-        return Msg.success().add("suc", suc);
+        User user= userService.login(userId, password);
+        return Msg.success().add("suc", null != user).add("user", user);
     }
-
 
     /**
      * 获取用户【今日】任务统计信息
