@@ -114,7 +114,7 @@ public class DamageController {
      * @param source 上传损伤的是人还是设备
      * @return 成功和失败的消息
      */
-    @RequestMapping(value = "post", method = RequestMethod.POST)
+    @RequestMapping(value = "/post", method = RequestMethod.POST)
     public Msg insertDamage(
             String location,
             Integer type,

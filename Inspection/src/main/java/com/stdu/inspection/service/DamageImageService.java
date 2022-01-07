@@ -30,4 +30,11 @@ public interface DamageImageService extends IService<DamageImage> {
      * @return 图片列表
      */
     List<DamageImage> listImageByDamageId(String damageId);
+
+    /**
+     * 上传图片的时候删除图片
+     * @param filename 图片名称
+     * @return 成功
+     */
+    boolean removePicture(String filename);
 }

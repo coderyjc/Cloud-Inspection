@@ -3,11 +3,25 @@ let BACKEND_BASE_URL = 'http://localhost:8086'
 
 const install = (Vue, vm) => {
 
-	let login =  (username, pwd) => vm.$u.get('/user/login', {id: username,pwd: pwd,});
+	// User
 	
+	// 登录
+	let login =  (username, pwd) => vm.$u.get('/user/login', {id: username,pwd: pwd,});
+	// 获取用户头像
 	let userAvatar = (userName) => BACKEND_BASE_URL + '/static/avatar/' + userName + '.png'
 	
-	vm.$u.api = {login, userAvatar};
+	//------------------------------------------------------
+	// Damage
+	// 损伤上报功能
+	let postDamage = (location, type, postId, description) => vm.$u.post('/damage/post', 
+		{location:location, type:type, postId:postId, source:'1',description:description})
+	// 删除损伤图片
+	let removeDamagePicture = (filename) => vm.$u.delete('/damage_image/remove', {filename: filename})
+	
+	//------------------------------------------------------
+	
+	
+	vm.$u.api = {login, userAvatar, removeDamagePicture, postDamage};
 }
 
 export default {

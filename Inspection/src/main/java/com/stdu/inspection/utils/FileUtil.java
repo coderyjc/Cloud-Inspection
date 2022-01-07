@@ -26,7 +26,8 @@ public class FileUtil {
      */
     public static void savePicture(MultipartFile file, String destDir, String filename) {
         if (file != null) {
-
+            // 保证文件夹存在
+            mkdir(destDir);
             //目标文件路径值
             String destPath = destDir + "/" + filename;
             File dest = new File(destPath);
@@ -42,7 +43,27 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 创建文件夹
+     * @param dest 文件夹的全路径
+     */
+    public static void mkdir(String dest) {
+        File file = new File(dest);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
 
+    /**
+     * 删除指定文件
+     * @param dest
+     */
+    public static void rm(String dest){
+        File file = new File(dest);
+        if(file.exists()){
+            file.delete();
+        }
+    }
 
 
 }

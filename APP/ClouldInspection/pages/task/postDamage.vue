@@ -4,7 +4,7 @@
 		<map :latitude="latitude" :longitude="longitude" scale="16" :markers=markers show-location="true">
 		</map>
 		<u-button @click="getLocation">{{buttonText}}</u-button>
-
+		<u-toast ref="uToast" />
 		<view class="u-demo-wrap">
 			<!-- 上传图片 -->
 			<view class="u-demo-area">
@@ -21,9 +21,14 @@
 							class="u-progress" :percent="item.progress"></u-line-progress>
 					</view>
 				</view>
-				<u-upload @on-choose-fail="onChooseFail" @on-success="success" :before-remove="beforeRemove"
-					ref="uUpload" :show-upload-list="showUploadList" :action="action" :file-list="fileList"
-					:max-count="maxCount" @on-list-change="onListChange">
+				<u-upload 
+					:before-remove="onRemove"
+					@on-success="success"
+					ref="uUpload" 
+					:show-upload-list="showUploadList" 
+					:action="action" 
+					:file-list="fileList"
+					:max-count="maxCount">
 				</u-upload>
 				<u-button :custom-style="{marginTop: '20rpx'}" @click="clear">清空列表</u-button>
 				<!-- <u-button :custom-style="{marginTop: '20rpx'}" @click="reUpload">重新上传</u-button> -->
@@ -54,6 +59,7 @@
 </template>
 
 <script>
+	
 	export default {
 		data() {
 			return {
@@ -61,10 +67,12 @@
 				markers: [{}, {}, {}],
 				poisdatas: [{}, {}, {}],
 				title: 'map',
-				latitude: 37.99296,
-				longitude: 114.484118,
+				latitude: 0,
+				longitude: 0,
+				// 用户信息
+				user: {},
 				// 上传图片的地址
-				action: 'http://127.0.0.1:8081/upload/damage',
+				action: '',
 				// 预置上传列表
 				fileList: [],
 				// 显示上传列表
@@ -74,10 +82,7 @@
 				// 组件内部的文件列表
 				lists: [],
 				// 钢轨损伤类型
-				damageTypeList: [{
-						typeId: "0",
-						typeName: "无法判断"
-					},
+				damageTypeList: [
 					{
 						typeId: "1",
 						typeName: "掉块"
@@ -106,6 +111,12 @@
 					that.buttonText = "位置：" + String(res.longitude) + " " + String(res.latitude)
 				}
 			});
+			// 获取用户id
+			let user = uni.getStorageSync('user')
+			if(user != null && user != '' && user != undefined){
+				this.user = user
+			}
+			this.action = 'http://127.0.0.1:8086/damage_image/put/' + user.userId
 		},
 		methods: {
 			getLocation() {
@@ -130,15 +141,15 @@
 				this.$refs.uUpload.clear();
 			},
 			upload() {
-				
 				this.$refs.uUpload.upload();
 			},
-			deleteItem(index) {
-				this.$refs.uUpload.remove(index);
+			deleteItem(index) { 
 			},
 			success(data) {
-				// 图片上传成功触发, data是服务器返回的参数
-				console.log(data);
+				this.lists.push({
+					url: data.extend.url,
+					filename: data.extend.filename
+				})
 			},
 			error(res, index, lists) {
 				// 上传失败触发
@@ -147,13 +158,41 @@
 					duration: 1500
 				})
 			},
-			onListChange(lists) {
-				// 当内部文件列表被加入文件、移除文件，或手动调用clear方法时触发
-				// console.log('onListChange', lists);
-				this.lists = lists;
-			},
-			beforeRemove(index, lists) {
+			onRemove(index, lists) {
+				let filename = this.lists[index].filename
+				this.$u.api.removeDamagePicture(filename)
 				return true;
+			},
+			// 提交
+			formSubmit(){
+				let location = this.longitude+','+this.latitude
+				if(location.length < 10){
+					this.$refs.uToast.show({
+						title: '位置获取失败',
+						type: 'error',
+					})
+					return
+				}
+				if(this.description.length < 10){
+					this.$refs.uToast.show({
+						title: '内容不得少于10字',
+						type: 'error',
+					})
+					return
+				}		
+				
+				this.$u.api.postDamage(
+					location, 
+					this.damageTypeList[this.typeIndex].typeId,
+					this.user.userId,
+					this.description
+				).then(res => {
+					this.$refs.uToast.show({
+						title: '上报成功',
+						type: 'success',
+						url: '/pages/index/index'
+					})
+				})
 			}
 		}
 	}

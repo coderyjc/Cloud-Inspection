@@ -20,7 +20,7 @@ public class AllowOriginIntercepter implements HandlerInterceptor {
         // 过滤器
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods","GET, POST, OPTIONS, PUT");
+        response.setHeader("Access-Control-Allow-Methods","GET, POST, OPTIONS, PUT, DELETE");
         response.setHeader("Access-Control-Allow-Headers","Authorization, Content-Type, token");
         return true;
     }

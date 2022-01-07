@@ -27,14 +27,8 @@ public class DamageImageServiceImpl extends ServiceImpl<DamageImageMapper, Damag
         QueryWrapper<DamageImage> wrapper = new QueryWrapper<>();
         wrapper.eq("update_id", postId);
         DamageImage damageImage = new DamageImage();
-        List<DamageImage> list = damageImage.selectList(wrapper);
-        // 执行更新操作
-        for (DamageImage item : list) {
-            item.setDamageId(damageId);
-            item.setUpdateId(0);
-            item.updateById();
-        }
-
+        damageImage.setDamageId(damageId);
+        damageImage.update(wrapper);
         return 1;
     }
 
@@ -44,5 +38,12 @@ public class DamageImageServiceImpl extends ServiceImpl<DamageImageMapper, Damag
         QueryWrapper<DamageImage> wrapper = new QueryWrapper<>();
         wrapper.eq("damage_id", damageId);
         return image.selectList(wrapper);
+    }
+
+    @Override
+    public boolean removePicture(String filename) {
+        QueryWrapper<DamageImage> wrapper = new QueryWrapper<>();
+        wrapper.eq("filename", filename);
+        return baseMapper.delete(wrapper) > 0;
     }
 }
