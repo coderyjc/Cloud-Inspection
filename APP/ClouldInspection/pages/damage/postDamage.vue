@@ -84,15 +84,15 @@
 				// 钢轨损伤类型
 				damageTypeList: [
 					{
-						typeId: "1",
+						typeId: "2",
 						typeName: "掉块"
 					},
 					{
-						typeId: "2",
+						typeId: "3",
 						typeName: "裂纹"
 					},
 					{
-						typeId: "3",
+						typeId: "4",
 						typeName: "擦伤"
 					},
 				],
@@ -198,7 +198,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	map {
 		width: 750rpx;
 		height: 500rpx;

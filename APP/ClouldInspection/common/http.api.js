@@ -17,11 +17,17 @@ const install = (Vue, vm) => {
 		{location:location, type:type, postId:postId, source:'1',description:description})
 	// 删除损伤图片
 	let removeDamagePicture = (filename) => vm.$u.delete('/damage_image/remove', {filename: filename})
-	
+	// 获取现在有的损伤列表
+	let getDamageList = (pn, limit) => vm.$u.get('/damage/listDamageUpToNow', {pn:pn, limit:limit})
 	//------------------------------------------------------
 	
 	
-	vm.$u.api = {login, userAvatar, removeDamagePicture, postDamage};
+	vm.$u.api = {
+		// Uer
+		login, userAvatar, 
+		// Damage
+		removeDamagePicture, postDamage, getDamageList
+	};
 }
 
 export default {

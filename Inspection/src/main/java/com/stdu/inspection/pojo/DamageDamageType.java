@@ -13,6 +13,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DamageDamageType {
+
+
     private Integer id;
 
     /**
@@ -60,5 +62,12 @@ public class DamageDamageType {
      * 损伤类型id
      */
     private Integer damageTypeId;
+
+
+    /**
+     * 上报来源，说明上报的是人还是车
+     */
+    private Integer postSource;
+
 
 }

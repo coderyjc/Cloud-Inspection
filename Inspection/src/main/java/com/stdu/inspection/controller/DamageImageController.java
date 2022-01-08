@@ -99,7 +99,7 @@ public class DamageImageController {
 
 
     /**
-     *
+     * 上传图片的时候删除图片
      * @param filename
      * @return
      */

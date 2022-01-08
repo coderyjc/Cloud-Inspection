@@ -66,17 +66,13 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
      * @param limit
      * @return
      */
-
     @Override
     public IPage<DamageDamageType> listDamageUptoNow(String pn, String limit) {
 
         IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
-        String time = TimeUtils.getCurrentTimeString(); // 获取当前系统时间，格式为 yyyy-MM-dd HH:mm:ss
 
-//        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<DamageDamageType>();
-//        wrapper.apply("UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('"+time+"')");
-//        System.out.println("UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP('"+tadayS+"')");
-
+        // 获取当前系统时间，格式为 yyyy-MM-dd HH:mm:ss
+        String time = TimeUtils.getCurrentTimeString();
         return baseMapper.listDamageUptoNow(iPage,time);
     }
 

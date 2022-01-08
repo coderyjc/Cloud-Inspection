@@ -24,7 +24,7 @@
 
     <sql id="Damage_Damage_type_Column_List">
         id, post_user, railway, location, description, post_date, status, type_name,
-        type_description, damage_type_id
+        type_description, damage_type_id, post_source
     </sql>
 
 <!--    获取当前已有损伤列表的字段-->

@@ -2,9 +2,7 @@ package com.stdu.inspection.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.pojo.DamageDamageType;
-import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.service.DamageImageService;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.utils.Msg;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 
 /**
  * <p>
@@ -40,7 +37,6 @@ public class DamageController {
      * @param time 前端传过来的字符串类型的时间
      * @return 返回日的损伤列表
      */
-
     @RequestMapping(value = "/listDamageToday", method = RequestMethod.GET)
     public Msg listDamageToday(
             @RequestParam(value = "time") String time,
@@ -67,23 +63,24 @@ public class DamageController {
     }
 
     /**
-     * 获取当前已有损伤列表
-     * 2021年11月11日22:52:52
-     * @param pn
-     * @param limit
+     * 【获取当前已有损伤列表】
+     * 2021年11月11日 22:52:52
+     * @param pn 第几页
+     * @param limit 容量
      * @return
      */
-    @RequestMapping(value = "/listDamageUptoNow")
+    @RequestMapping(value = "/listDamageUpToNow")
     public Msg listDamageUptoNow(
             @RequestParam(value = "pn")String pn,
             @RequestParam(value = "limit")String limit
     )
     {
         IPage<DamageDamageType> listDamageUptoNow = damageService.listDamageUptoNow(pn, limit);
-        return Msg.success().add("listDamageUptoNow",listDamageUptoNow);
+        return Msg.success().add("list",listDamageUptoNow);
     }
 
-    /**获取单个损伤的详情信息
+    /**
+     * 【获取单个损伤的详情信息】
      * 2021年11月14日23:11:02
      * @param damageId
      * @return DamageDamageType视图
@@ -96,7 +93,6 @@ public class DamageController {
         DamageDamageType getDamageById = damageService.getDamageById(damageId);
         return Msg.success().add("getDamageById",getDamageById);
     }
-
 
     /**
      * 【上传损伤】
@@ -121,7 +117,7 @@ public class DamageController {
             Integer postId,
             Integer source,
             String description
-            ){
+    ){
 
         // 返回损伤类型号
         int damageId =

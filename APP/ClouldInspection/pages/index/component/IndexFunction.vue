@@ -11,7 +11,7 @@
 			</view>
 		</view>
 		<!-- 巡检 -->
-		<view class="function-item">
+		<view class="function-item" @click="nav_inspect()">
 			<view class="item-icon">
 				<u-icon name="search" color="#2979ff" size="58"></u-icon>
 			</view>
@@ -45,13 +45,13 @@
 		},
 		methods: {
 			nav_postDamage(){
-				this.$u.route('/pages/task/postDamage');
+				this.$u.route('/pages/damage/postDamage');
 			},
-			nav_inspecte(){
-				
+			nav_inspect(){
+				this.$u.route('/pages/damage/inspect');
 			},
 			nav_alart(){
-				this.$u.route('/pages/task/alert');
+				this.$u.route('/pages/damage/alert');
 			}
 		}
 	}

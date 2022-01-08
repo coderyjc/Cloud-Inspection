@@ -31,12 +31,13 @@
 		onShow() {
 			// 判断用户有没有登录，以跳转到登录页
 			if (this.getGlobalUser() == null) {
-				// 跳转到登录页
-				// uni.navigateTo({
-				// 	url: '/pages/home/login'
-				// })
+				跳转到登录页
+				uni.navigateTo({
+					url: '/pages/home/login'
+				})
 			}
-			// 获取本页面的数据
+			// 获取本页面的相关数据
+			
 		},
 		onLoad() {
 

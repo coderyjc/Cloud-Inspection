@@ -1,13 +1,26 @@
 <template>
 	<view class="task-list">
-		<scroll-view scroll-y style="height: calc(100vh - var(--window-top) - var(--window-bottom))"
-			refresher-enabled="true" refresher-background="#5098ff" :refresher-triggered="triggered"
-			@refresherrefresh="onRefresh" @refresherrestore="onRestore" @scrolltolower="reachBottom">
+		<scroll-view 
+			scroll-y style="height: calc(100vh - var(--window-top) - var(--window-bottom))"
+			refresher-enabled="true" 
+			refresher-background="#5098ff" 
+			:refresher-triggered="triggered"
+			@refresherrefresh="onRefresh" 
+			@refresherrestore="onRestore" 
+			@scrolltolower="reachBottom">
+			
 			<u-toast ref="uToast" />
-
-			<TaskItem v-for="(item) in [1, 2, 3, 4, 5]" margin="8px" padding="10" @body-click="nav_details"></TaskItem>
-
-			<u-loadmore :status="loadStatus" bgColor="#f2f2f2" :load-text="loadText"></u-loadmore>
+			
+			<TaskItem 
+				v-for="(item) in [1, 2, 3, 4, 5]" 
+				margin="8px" 
+				padding="10" 
+				@body-click="nav_details"></TaskItem>
+			
+			<u-loadmore 
+				:status="loadStatus" 
+				bgColor="#f2f2f2" 
+				:load-text="loadText"></u-loadmore>
 		</scroll-view>
 	</view>
 </template>
@@ -39,9 +52,7 @@
 		},
 		methods: {
 			nav_details() {
-				uni.navigateTo({
-					url: '/pages/damage/damageDetail'
-				})
+				this.$u.route('/pages/damage/damageDetail')
 			},
 			onRefresh() {
 				if(this._freshing == true) return
@@ -61,8 +72,8 @@
 				this._freshing = false // 需要重置
 			},
 			reachBottom() {
-				this.loadStatus = 'nomore'
-				console.log("触底了")
+				this.loadStatus = 'loading'
+				// console.log("触底了")
 			},
 		}
 	}

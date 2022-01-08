@@ -34,6 +34,7 @@ export function createApp() {
 }
 // #endif
 
+// 挂载用户的本地缓存信息到全局
 Vue.prototype.getGlobalUser = function(){
 	var userInfo = uni.getStorageSync("user")
 	if(userInfo != null && userInfo != "" && userInfo != undefined){

@@ -37,7 +37,7 @@
             }
         }
         ,{
-            "path" : "pages/task/postDamage",
+            "path" : "pages/damage/postDamage",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "报告损伤",
@@ -116,7 +116,7 @@
             }
         }
         ,{
-            "path" : "pages/task/alert",
+            "path" : "pages/damage/alert",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "损伤报警"
@@ -150,6 +150,15 @@
 				"navigationBarBackgroundColor": "#000000"
 			}
 		}
+        ,{
+            "path" : "pages/damage/inspect",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTitleText": "uni-app",
