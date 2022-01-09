@@ -56,7 +56,7 @@
             "path" : "pages/damage/damageDetail",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "任务详情",
+                "navigationBarTitleText": "损伤详情",
                 "enablePullDownRefresh": false
             }
         }

@@ -10,6 +10,7 @@ import com.stdu.inspection.pojo.DamageDamageType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,7 +26,8 @@ public interface DamageMapper extends BaseMapper<Damage> {
 
     IPage<DamageDamageType> listDamageToday(IPage<DamageDamageType> iPage,@Param("time") String time);
 
-    IPage<DamageDamageType> listDamageUptoNow(IPage<DamageDamageType> iPage,@Param("time") String time);
 
-    DamageDamageType getDamageById(@Param(Constants.WRAPPER) QueryWrapper<DamageDamageType> wrapper);
+    DamageDamageType getDamageById(@Param(Constants.WRAPPER) QueryWrapper<DamageDamageType> ew);
+
+    IPage<DamageDamageType> listDamageUptoNow(IPage<DamageDamageType> iPage, Wrapper ew);
 }

@@ -20,7 +20,7 @@
 				:source="item.postSource"
 				:type="item.damageTypeId"
 				:description="item.description"
-				@body-click="nav_details"></TaskItem>
+				@body-click="nav_details(item.id)"></TaskItem>
 			
 			<u-loadmore 
 				:status="loadStatus" 
@@ -70,8 +70,10 @@
 			this.get_data(this.pn, this.limit)
 		},
 		methods: {
-			nav_details() {
-				this.$u.route('/pages/damage/damageDetail')
+			nav_details(id) {
+				this.$u.route('/pages/damage/damageDetail', {
+					id: id
+				})
 			},
 			async get_data(pn, limit){
 				await this.$u.api.getDamageList(pn, limit).then(res => {

@@ -12,6 +12,21 @@ package com.stdu.inspection.utils;
  */
 public class ConstUtil {
 
+    // 损伤已经在处理
+    public static final int DAMAGE_REPAIRING = 1;
+
+    // 损伤已修复
+    public static final int DAMAGE_REPAIRED = 2;
+
+    // 任务状态-任务已接收
+    public static final int TASK_ACCEPT = 1;
+
+    // 任务状态-任务已提交
+    public static final int TASK_COMMIT = 2;
+
+    // 任务状态-任务已完成
+    public static final int TASK_COMPLETE = 3;
+
     /**
      * 项目的静态资源所在的根目录
      * 比如 图片文件夹 等
@@ -23,4 +38,6 @@ public class ConstUtil {
      */
     public static final String DAMAGE_PICTURE = BASE_ROOT + "damage_picture";
 
+
 }
+

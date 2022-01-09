@@ -19,14 +19,22 @@ const install = (Vue, vm) => {
 	let removeDamagePicture = (filename) => vm.$u.delete('/damage_image/remove', {filename: filename})
 	// 获取现在有的损伤列表
 	let getDamageList = (pn, limit) => vm.$u.get('/damage/listDamageUpToNow', {pn:pn, limit:limit})
+	// 获取指定损伤的图片
+	let getDamagePicture = (id) => vm.$u.get('/damage_image/get', {id: id})
+	// 获取指定损伤的详细信息
+	let getDamageDetail = (id) => vm.$u.get('/damage/getDamageById', {damageId: id})
 	//------------------------------------------------------
 	
+	// 获取图片
+	let getPicture = (filename) => BACKEND_BASE_URL + '/static/damage_picture/' + filename
 	
 	vm.$u.api = {
 		// Uer
 		login, userAvatar, 
 		// Damage
-		removeDamagePicture, postDamage, getDamageList
+		removeDamagePicture, postDamage, getDamageList, getDamagePicture, getDamageDetail,
+		
+		getPicture
 	};
 }
 

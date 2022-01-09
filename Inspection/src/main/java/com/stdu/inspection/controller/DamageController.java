@@ -91,7 +91,7 @@ public class DamageController {
     )
     {
         DamageDamageType getDamageById = damageService.getDamageById(damageId);
-        return Msg.success().add("getDamageById",getDamageById);
+        return Msg.success().add("info",getDamageById);
     }
 
     /**

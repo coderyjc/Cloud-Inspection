@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.mapper.DamageMapper;
 import com.stdu.inspection.pojo.DamageDamageType;
+import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.service.DamageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stdu.inspection.utils.TimeUtils;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -68,12 +70,11 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
      */
     @Override
     public IPage<DamageDamageType> listDamageUptoNow(String pn, String limit) {
-
         IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
-
-        // 获取当前系统时间，格式为 yyyy-MM-dd HH:mm:ss
-        String time = TimeUtils.getCurrentTimeString();
-        return baseMapper.listDamageUptoNow(iPage,time);
+        QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("post_date");
+        wrapper.eq("status", 0);
+        return baseMapper.listDamageUptoNow(iPage, wrapper);
     }
 
     /**
@@ -92,22 +93,17 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
     public int insert(String location, Integer type, Integer postId, Integer source, String description) {
 
         Damage damage = new Damage();
+        Date now = new Date();
         damage.setId(null);
         damage.setDamageType(type);
         damage.setStatus(0);
         damage.setLocation(location);
         damage.setPostUser(postId);
-        damage.setPostDate(new Date());
+        damage.setPostDate(TimeUtils.castDateStringToDateType(TimeUtils.castDateTypeToDateString(now)));
         damage.setDescription(description);
         damage.setPostSource(source);
         damage.setFixedDate(null);
         damage.insert();
-
-//        这里是个性能比较差的地方，先插进去数据，再拿出来看看id，比较费时间，但也只能这样了。
-        QueryWrapper<Damage> queryWrapper  = new QueryWrapper<>();
-        queryWrapper.eq("location", location);
-        queryWrapper.eq("post_user", postId);
-        damage = damage.selectOne(queryWrapper);
         return damage.getId();
     }
 }

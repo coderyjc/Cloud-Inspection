@@ -43,7 +43,7 @@ public class DamageImageController {
             @RequestParam("id") String damageId
     ){
         List<DamageImage> image = service.listImageByDamageId(damageId);
-        return Msg.success().add("image", image);
+        return Msg.success().add("images", image);
     }
 
 

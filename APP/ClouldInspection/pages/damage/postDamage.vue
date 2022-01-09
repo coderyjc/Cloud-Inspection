@@ -84,6 +84,10 @@
 				// 钢轨损伤类型
 				damageTypeList: [
 					{
+						typeId: "1",
+						typeName: "未知"
+					},
+					{
 						typeId: "2",
 						typeName: "掉块"
 					},

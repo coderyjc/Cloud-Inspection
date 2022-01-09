@@ -2,14 +2,12 @@
 	<view>
 		<view class="wrap">
 			<view class="task-list">
-				<TaskList></TaskList>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
-	import TaskList from '../../../components/TaskList/TaskList.vue'
 
 	export default {
 		components: {

@@ -41,4 +41,11 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     Integer getTaskCountByTime(String time);
+
+    /**
+     * 接单 - 向表中插入一条数据
+     * @param damage 损伤id
+     * @param user 用户id
+     */
+    void insert(int damage, int user);
 }

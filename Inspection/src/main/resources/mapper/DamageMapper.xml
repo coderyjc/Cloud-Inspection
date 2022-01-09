@@ -33,23 +33,19 @@
                 type_description, damage_type_id
     </sql>
 
-
     <select id="listDamageToday" resultType="com.stdu.inspection.pojo.DamageDamageType">
         select <include refid="Damage_Damage_type_Column_List" />
         from v_damage_damage_type where post_date like '%${time}%'
-    </select>
-
-<!--&lt; 转义-->
-    <select id="listDamageUptoNow" resultType="com.stdu.inspection.pojo.DamageDamageType">
-        select <include refid="Damage_Damage_type_Column_List" />
-        from v_damage_damage_type
-        WHERE
-        UNIX_TIMESTAMP(post_date) &lt;  UNIX_TIMESTAMP(#{time})
-
     </select>
 
     <select id="getDamageById" resultType="com.stdu.inspection.pojo.DamageDamageType">
         select <include refid="Damage_Damage_type_Column_List" /> from v_damage_damage_type
             ${ew.customSqlSegment}
     </select>
+
+    <select id="listDamageUptoNow" resultType="com.stdu.inspection.pojo.DamageDamageType">
+        select <include refid="Damage_Damage_type_Column_List" /> from v_damage_damage_type
+        ${ew.customSqlSegment}
+    </select>
+
 </mapper>

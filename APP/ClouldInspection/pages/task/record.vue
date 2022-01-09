@@ -31,8 +31,8 @@
 </template>
 
 <script>
-import TaskList from '../../components/TaskList/TaskList.vue'
-import ProcessList from '../../components/ProcessList/ProcessList.vue'
+import TaskList from './component/TaskList/TaskList.vue'
+import ProcessList from './component/ProcessList/ProcessList.vue'
 
 export default {
 	components:{

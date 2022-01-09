@@ -3,6 +3,7 @@ package com.stdu.inspection.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.TaskProcess;
+import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
 import com.stdu.inspection.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class TaskController {
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    DamageService damageService;
 
     /**
      * 根据时间查询今日总任务数量（检查量）
@@ -78,6 +82,26 @@ public class TaskController {
 
         return Msg.success();
 
+    }
+
+
+    /**
+     * 【接单，用户接收巡检任务，向任务表中插入一条数据】
+     * @param damageId 损伤id
+     * @param userId 接收用户的用户id
+     * @return
+     */
+    @RequestMapping(value = "/acquire", method = RequestMethod.POST)
+    public Msg insertTask(
+            @RequestParam("damageid") String damageId,
+            @RequestParam("id")String userId
+    ){
+        // 先向任务表中插入一条这个用户对于这个损伤的工单
+        taskService.insert(Integer.parseInt(damageId), Integer.parseInt(userId));
+
+        // 然后在damage表中将status置为“已”
+
+        return Msg.success();
     }
 
 

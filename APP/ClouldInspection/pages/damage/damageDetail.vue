@@ -10,19 +10,17 @@
 				</view>
 				<!-- 损伤图片 -->
 				<view class="image-set">
-					<image src="../../static/rails/001.png" mode="aspectFill"></image>
-					<image src="../../static/rails/002.png" mode="aspectFill"></image>
-					<image src="../../static/rails/003.png" mode="aspectFill"></image>
-					<image src="../../static/rails/004.png" mode="aspectFill"></image>
+					<image 
+					 v-for="(item,index) in picture_list"
+					 :src="item" mode="aspectFill">
+					 </image>
+					 <view v-if="picture_list.length === 0">暂无图片</view>
 				</view>
+				<view class="damage-type"> 检修时间：{{damage_info.postDate | timeFormat}}</view>
 				<!-- 类型 -->
-				<view class="damage-type">
-					损伤类型：擦伤
-				</view>
+				<view class="damage-type"> 损伤类型：擦伤 </view>
 				<!-- 描述 -->
-				<view class="damage-desc">
-					钢管接口处发现略大划痕，枕木下沉距离过大，可能引起列车颠簸出轨，建议派人修理，更换枕木，有些枕木老化严重，有断裂迹象，建议更换......
-				</view>
+				<view class="damage-desc"> {{damage_info.description}} </view>
 			</view>
 			<view class="btn-group">
 				<!-- 提交任务 -->
@@ -33,75 +31,106 @@
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				markers: [{
-					id:'1',
-					latitude: 37.99296,
-					longitude: 114.484118
-				}],
-				poisdatas: [{}],
-				title: 'map',
+import {getTime} from '../../utils/timeutil.js'
+
+export default {
+	data() {
+		return {
+			// 地图坐标相关
+			markers: [{
+				id:'1',
 				latitude: 37.99296,
 				longitude: 114.484118
-			}
+			}],
+			poisdatas: [{}],
+			title: 'map',
+			latitude: 37.99296,
+			longitude: 114.484118,
+			// 损伤相关
+			damage_id: 0,
+			damage_info: {},
+			picture_list: []
+		}
+	},
+	onLoad(options) {
+		this.damage_id = options.id
+	},
+	mounted() {
+		this.get_damage_detail()
+		this.get_damage_picture()
+	},
+	filters:{
+		timeFormat(time){
+			return getTime(time)
+		}
+	},
+	methods: {
+		async get_damage_detail(){
+			await this.$u.api.getDamageDetail(this.damage_id).then(res => {
+				this.damage_info = res.info
+			})
 		},
-		methods: {
-
+		get_damage_picture(){
+			this.$u.api.getDamagePicture(this.damage_id).then(res => {
+				res.images.forEach(res =>{
+					this.picture_list.push(this.$u.api.getPicture(res.filename))
+				})
+			})
 		}
 	}
+}
 </script>
 
 <style lang="scss" scoped>
-	.progress{
+.progress{
+	background-color: #F6F6F6;
+	padding: 1px 5px;
+	.progress-info{
 		
-		background-color: rgba($color: #F3F3F3, $alpha: 1.0);
-
-		.progress-info{
+		view{
+			font-size: 15px;
+			margin-top: 10px;
+			background-color: #fff;
+			border-radius: 10px;
+			padding: 10px;
+		}
+		
+		.image-set{
+			display: flex;
+			justify-content: space-around;
+			flex-wrap: wrap;
+			align-items: center;
 			
-			.image-set{
-				display: flex;
-				justify-content: center;
-				flex-wrap: wrap;
-				align-items: center;
-				
-				image{
-					height: 200rpx;
-					width: 250rpx;
-					margin: 5px;
-				}
-			}
-			
-			view{
-				font-size: 15px;
-				// margin-top: 10px;
-				background-color: #fff;
-				border-radius: 10px;
-				padding: 10px;
-			}
-			
-			.damage-location{
-				map{
-					width: 100%;
-					height: 500rpx;
-					margin-top: 10px;
-				}
+			image{
+				height: 200rpx;
+				width: 250rpx;
+				margin: 5px;
 			}
 		}
 		
-		.btn-group{
-			margin-top: 10px;
-			button{
-				margin-top: 10px;
-			}
-			.receive-button{
-				background-color: #3DB0FC;
-				color: white;
-				border-radius: 0;
+
+		
+		.damage-location{
+			map{
 				width: 100%;
-				
+				height: 500rpx;
+				margin-top: 10px;
 			}
 		}
 	}
+	
+	.btn-group{
+		margin-top: 10px;
+		button{
+			margin-top: 10px;
+		}
+		.receive-button{
+			background-color: #3DB0FC;
+			color: white;
+			border-radius: 0;
+			width: 100%;
+			
+		}
+	}
+}
 </style>
