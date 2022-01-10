@@ -19,5 +19,5 @@ public interface TaskMapper extends BaseMapper<Task> {
 
     TaskProcess getTaskProcessById(String taskId);
 
-    IPage<TaskProcess> listTaskByProcess(IPage<TaskProcess> iPage, Wrapper wrapper);
+    IPage<TaskProcess> listTaskByProcess(IPage<TaskProcess> iPage, Wrapper ew);
 }

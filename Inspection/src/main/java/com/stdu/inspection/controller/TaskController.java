@@ -2,6 +2,7 @@ package com.stdu.inspection.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
@@ -104,6 +105,24 @@ public class TaskController {
         damageService.updateDamageStatus(Integer.parseInt(damageId), ConstUtil.DAMAGE_REPAIRING);
 
         return Msg.success().add("suc", true);
+    }
+
+
+    /**
+     * 分页获取用用户已经接单的任务列表
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public Msg listTaskByUser(
+            @RequestParam(value = "id") String userId,
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "5") String limit
+    ){
+        IPage<TaskProcess> ipage = taskService.listTaskByUser(userId, pn, limit);
+        return Msg.success().add("list", ipage);
     }
 
 

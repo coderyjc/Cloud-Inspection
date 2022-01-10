@@ -1,8 +1,7 @@
 <template>
 	<view>
 		<view class="wrap">
-			<view class="task-list">
-			</view>
+			超时的工单
 		</view>
 	</view>
 </template>
@@ -11,7 +10,6 @@
 
 	export default {
 		components: {
-			TaskList
 		},
 		data() {
 			return {

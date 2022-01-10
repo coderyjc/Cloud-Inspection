@@ -36,4 +36,7 @@ public class TaskProcess {
 
     private String description;
 
+    private Integer type;
+
+    private Integer source;
 }

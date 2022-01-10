@@ -2,6 +2,7 @@
 	<view>
 		<view class="wrap">
 			<view class="task-list">
+				维修完成的工单
 			</view>
 		</view>
 	</view>
@@ -11,7 +12,6 @@
 
 	export default {
 		components: {
-			TaskList
 		},
 		data() {
 			return {

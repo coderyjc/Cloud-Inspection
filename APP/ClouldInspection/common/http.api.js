@@ -4,7 +4,6 @@ let BACKEND_BASE_URL = 'http://localhost:8086'
 const install = (Vue, vm) => {
 
 	// User
-	
 	// 登录
 	let login =  (username, pwd) => vm.$u.get('/user/login', {id: username,pwd: pwd,});
 	// 获取用户头像
@@ -23,12 +22,17 @@ const install = (Vue, vm) => {
 	let getDamagePicture = (id) => vm.$u.get('/damage_image/get', {id: id})
 	// 获取指定损伤的详细信息
 	let getDamageDetail = (id) => vm.$u.get('/damage/getDamageById', {damageId: id})
+	
 	//------------------------------------------------------
 	// 获取图片
 	let getPicture = (filename) => BACKEND_BASE_URL + '/static/damage_picture/' + filename
+	
 	//------------------------------------------------------
 	// Task
+	// 接收任务
 	let acquireTask = (userId, damageId) => vm.$u.post('/task/acquire', {damageid: damageId, id: userId})
+	// 获取用户正在进行的任务
+	let taskOnGoing = (userId, page, limit) => vm.$u.get('/task/user', {id: userId, pn: page, limit: limit}) 
 	
 	vm.$u.api = {
 		// Uer
@@ -38,7 +42,7 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask
+		acquireTask, taskOnGoing
 	};
 }
 

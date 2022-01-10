@@ -61,4 +61,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
         task.insert();
     }
+
+    @Override
+    public IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit) {
+        IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
+        QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();
+        wrapper.eq("receiver", Integer.parseInt(userId));
+        return baseMapper.listTaskByProcess(iPage, wrapper);
+    }
 }

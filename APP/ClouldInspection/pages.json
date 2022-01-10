@@ -45,7 +45,7 @@
             }
         }
         ,{
-            "path" : "pages/task/progress",
+            "path" : "pages/task/process",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "工作进度",
@@ -130,7 +130,7 @@
             }
         }
         ,{
-            "path" : "pages/task/today/toDo",
+            "path" : "pages/task/today/ongoing",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "待提交"
@@ -152,6 +152,15 @@
 		}
         ,{
             "path" : "pages/damage/inspect",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/task/today/checking",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",

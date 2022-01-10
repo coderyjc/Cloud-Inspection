@@ -34,6 +34,15 @@ public interface TaskService extends IService<Task> {
     IPage<TaskProcess> listTaskByProcess(String status, String pn, String limit);
 
     /**
+     * 分页获取用用户已经接收的任务列表
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+     IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit);
+
+    /**
      * 2021年11月7日23:32:31
      * 根据日期查询某天任务总数
      *
@@ -48,4 +57,5 @@ public interface TaskService extends IService<Task> {
      * @param user 用户id
      */
     void insert(int damage, int user);
+
 }

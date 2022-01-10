@@ -44,49 +44,53 @@
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				markers: [{
-					id:'1',
-					latitude: 38.02551808661723,
-					longitude: 114.48723424885557
-				}],
-				poisdatas: [{}],
-				title: 'map',
+export default {
+	data() {
+		return {
+			markers: [{
+				id:'1',
 				latitude: 38.02551808661723,
-				longitude: 114.48723424885557,
-				steps: [{
-					name: '任务发布'
-				}, {
-					name: '接受任务'
-				}, {
-					name: '提交结果'
-				}, {
-					name: '验收成功'
-				}, ],
-				// 当前进行到的步骤
-				current: 1
-			}
+				longitude: 114.48723424885557
+			}],
+			poisdatas: [{}],
+			title: 'map',
+			latitude: 38.02551808661723,
+			longitude: 114.48723424885557,
+			steps: [{
+				name: '任务发布'
+			}, {
+				name: '接受任务'
+			}, {
+				name: '提交结果'
+			}, {
+				name: '验收成功'
+			}, ],
+			// 当前进行到的步骤
+			current: 1
+		}
+	},
+	onLoad(options) {
+		this.task_id = options.id
+		console.log(options);
+	},
+	methods: {
+		submitTask(){
+			uni.navigateTo({
+				url:'/pages/task/operation/submitTask'
+			})
 		},
-		methods: {
-			submitTask(){
-				uni.navigateTo({
-					url:'/pages/task/operation/submitTask'
-				})
-			},
-			cancelTask(){
-				uni.navigateTo({
-					url:'/pages/task/operation/cancelTask'
-				})
-			},
-			delayTask(){
-				uni.navigateTo({
-					url:'/pages/task/operation/delayTask'
-				})
-			}
+		cancelTask(){
+			uni.navigateTo({
+				url:'/pages/task/operation/cancelTask'
+			})
+		},
+		delayTask(){
+			uni.navigateTo({
+				url:'/pages/task/operation/delayTask'
+			})
 		}
 	}
+}
 </script>
 
 <style lang="scss" scoped>
