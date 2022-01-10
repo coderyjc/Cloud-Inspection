@@ -57,6 +57,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             .setStatus(ConstUtil.TASK_ACCEPT)
             .setDeadline(new Date(now.getTime() + 86400000L));
 
+        // 截止日期为1天
+
         task.insert();
     }
 }

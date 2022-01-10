@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
+import com.stdu.inspection.utils.ConstUtil;
 import com.stdu.inspection.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -99,9 +100,10 @@ public class TaskController {
         // 先向任务表中插入一条这个用户对于这个损伤的工单
         taskService.insert(Integer.parseInt(damageId), Integer.parseInt(userId));
 
-        // 然后在damage表中将status置为“已”
+        // 然后在damage表中将status置为“已接收任务”
+        damageService.updateDamageStatus(Integer.parseInt(damageId), ConstUtil.DAMAGE_REPAIRING);
 
-        return Msg.success();
+        return Msg.success().add("suc", true);
     }
 
 

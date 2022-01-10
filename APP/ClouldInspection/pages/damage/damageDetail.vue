@@ -2,6 +2,7 @@
 	<view class="progress">
 		<view class="progress-wrap">
 			<view class="progress-info">
+				<u-toast ref="uToast" isTab/>
 				<!-- 损伤位置 -->
 				<view class="damage-location">
 					<!-- 这里用地图组件显示出来 -->
@@ -24,7 +25,7 @@
 			</view>
 			<view class="btn-group">
 				<!-- 提交任务 -->
-				<button class="receive-button">接单</button>
+				<button class="receive-button" @click="acquire_task">接单</button>
 			</view>
 		</view>
 	</view>
@@ -75,6 +76,20 @@ export default {
 				res.images.forEach(res =>{
 					this.picture_list.push(this.$u.api.getPicture(res.filename))
 				})
+			})
+		},
+		acquire_task(){
+			let user = this.getGlobalUser()
+			this.$u.api.acquireTask(user.userId, this.damage_id).then(res => {
+				this.$refs.uToast.show({
+					title: '接单成功',
+					type: 'success',
+				})
+				setTimeout(function(){
+					uni.switchTab({
+						url:'../task/task'
+					})
+				}, 2000)
 			})
 		}
 	}

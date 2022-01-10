@@ -34,8 +34,8 @@
 			}
 		},
 		onShow() {
-			let user = uni.getStorageSync('user')
-			if(null != user && "" != user && undefined != user){
+			let user = this.getGlobalUser()
+			if(null != user){
 				this.userIsLogin = true
 				this.userInfo = user
 				this.userAvatar = this.$u.api.userAvatar(this.userInfo.userId)

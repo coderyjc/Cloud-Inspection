@@ -59,4 +59,13 @@ public interface DamageService extends IService<Damage> {
      */
     int insert(String location, Integer type, Integer postId, Integer source, String description);
 
+
+    /**
+     * 改变damage的状态，也就是改变status字段的状态
+     * 1表示未修复
+     * 2表示正在修复
+     * 3表示已经修复
+     * @param status 要改变为的状态
+     */
+    void updateDamageStatus(int id, int status);
 }

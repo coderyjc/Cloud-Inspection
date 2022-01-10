@@ -24,17 +24,21 @@ const install = (Vue, vm) => {
 	// 获取指定损伤的详细信息
 	let getDamageDetail = (id) => vm.$u.get('/damage/getDamageById', {damageId: id})
 	//------------------------------------------------------
-	
 	// 获取图片
 	let getPicture = (filename) => BACKEND_BASE_URL + '/static/damage_picture/' + filename
+	//------------------------------------------------------
+	// Task
+	let acquireTask = (userId, damageId) => vm.$u.post('/task/acquire', {damageid: damageId, id: userId})
 	
 	vm.$u.api = {
 		// Uer
 		login, userAvatar, 
 		// Damage
 		removeDamagePicture, postDamage, getDamageList, getDamagePicture, getDamageDetail,
-		
-		getPicture
+		// Picture
+		getPicture,
+		// Task
+		acquireTask
 	};
 }
 

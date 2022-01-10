@@ -73,7 +73,7 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
         IPage<DamageDamageType> iPage = new Page<DamageDamageType>(Integer.parseInt(pn),Integer.parseInt(limit));
         QueryWrapper<DamageDamageType> wrapper = new QueryWrapper<>();
         wrapper.orderByDesc("post_date");
-        wrapper.eq("status", 0);
+        wrapper.eq("status", 1);
         return baseMapper.listDamageUptoNow(iPage, wrapper);
     }
 
@@ -105,5 +105,11 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
         damage.setFixedDate(null);
         damage.insert();
         return damage.getId();
+    }
+
+    @Override
+    public void updateDamageStatus(int id, int status) {
+        Damage damage = new Damage();
+        damage.setId(id).setStatus(status).updateById();
     }
 }

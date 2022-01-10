@@ -1,15 +1,15 @@
 <template>
 	<view class="task-process">
 		<u-grid :col="3">
-			<u-grid-item>
+			<u-grid-item @click="nav_task_list()">
 				<u-icon name="list" color="#0984e3" size="58"></u-icon>
 				<view class="grid-text">现有损伤</view>
 			</u-grid-item>
-			<u-grid-item>
+			<u-grid-item @click="nav_task_ongoing()">
 				<u-icon name="play-right" color="#0984e3" size="58"></u-icon>
 				<view class="grid-text">正在进行</view>
 			</u-grid-item>
-			<u-grid-item>
+			<u-grid-item @click="nav_task_checking()">
 				<u-icon name="hourglass-half-fill" color="#00b894" size="58"></u-icon>
 				<view class="grid-text">审核中</view>
 			</u-grid-item>
@@ -43,9 +43,17 @@ export default {
 		},
 		onLoad() {
 
-
 		},
 		methods: {
+			nav_task_list(){
+				
+			},
+			nav_task_ongoing(){
+				
+			},
+			nav_task_checking(){
+				
+			},
 			nav_outOfTime(){
 				this.$u.route('/pages/task/today/outOfTime');
 			},
