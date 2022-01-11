@@ -1,26 +1,24 @@
 <template>
 	<view class="progress">
 		<view class="progress-wrap">
-			<view class="progress-area">
-				<u-steps :current="current" 
+			<view class="progress-info">
+				<u-steps :current="task.status" 
 						:list="steps" 
 						mode="dot"></u-steps>
-			</view>
-			<view class="progress-info">
 				<!-- 损伤图片 -->
-				<view>
-					<image src="../../static/rails/001.png" mode="aspectFill"></image>
-					<image src="../../static/rails/002.png" mode="aspectFill"></image>
-					<image src="../../static/rails/003.png" mode="aspectFill"></image>
-					<image src="../../static/rails/004.png" mode="aspectFill"></image>
+				<view class="card-left">
+					<!-- 图片 -->
+					<image v-for="(item,index) in picture_list"
+					:src="item" 
+					mode="aspectFill"></image>
 				</view>
 				<!-- 类型 -->
 				<view class="damage-type">
-					损伤类型：钢轨接头伤损
+					损伤类型：{{damageType[task.type-1]}}
 				</view>
 				<!-- 截止日期 -->
 				<view class="damage-deadline">
-					截止日期：2021-08-31
+					截止日期：{{ task.deadline | timeFormat }}
 				</view>
 				<!-- 损伤位置 -->
 				<view class="damage-location">
@@ -30,9 +28,7 @@
 					</map>
 				</view>
 				<!-- 描述 -->
-				<view class="damage-desc">
-					描述：钢管接口处发现略大划痕，枕木下沉距离过大，可能引起列车颠簸出轨，建议派人修理，更换枕木，有些枕木老化严重，有断裂迹象，建议更换......
-				</view>
+				<view class="damage-desc">{{task.description}}</view>
 			</view>
 			<view class="btn-group">
 				<u-button type="warning" @click="delayTask">申请延时</u-button>
@@ -44,6 +40,8 @@
 </template>
 
 <script>
+import {getTime} from '../../utils/timeutil.js'
+	
 export default {
 	data() {
 		return {
@@ -65,15 +63,34 @@ export default {
 			}, {
 				name: '验收成功'
 			}, ],
-			// 当前进行到的步骤
-			current: 1
+			task: {},
+			damageType: ['未知','掉块','裂纹','擦伤'],
+			picture_list:[]
 		}
 	},
 	onLoad(options) {
 		this.task_id = options.id
-		console.log(options);
+	},
+	mounted() {
+		this.fetch_data()
+	},
+	filters:{
+		timeFormat(time){
+			return getTime(time)
+		}
 	},
 	methods: {
+		async fetch_data(){
+			await this.$u.api.getTaskProcess(this.task_id).then(res => {
+				this.task = res.taskProcess
+				
+				this.$u.api.getDamagePicture(this.task.damageId).then(res => {
+					res.images.forEach(res =>{
+						this.picture_list.push(this.$u.api.getPicture(res.filename))
+					})
+				})
+			})
+		},
 		submitTask(){
 			uni.navigateTo({
 				url:'/pages/task/operation/submitTask'
@@ -97,14 +114,14 @@ export default {
 	.progress{
 		background-color: #F3F3F3;
 		
-		padding: 20px 20px 20px 10px;
+		padding: 1px 20px 20px 10px;
 		
 		.level-5{
 			color: red;
 		}
 		
 		.progress-info{
-			margin-top: 20px;
+			margin-top: 10px;
 			image{
 				height: 200rpx;
 				width: 300rpx;

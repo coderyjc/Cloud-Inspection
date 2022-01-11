@@ -6,7 +6,7 @@
 				<view class="card-head" slot="head">
 					<text class="card-head-text">{{ deadline | getTime }} 截止</text>
 					<view class="tag-group">
-						<u-tag :text="typeList[type]" mode="light" />
+						<u-tag :text="typeList[type-1]" mode="light" />
 						<u-tag :text="sourceList[source]" mode="light" />
 					</view>
 				</view>
@@ -77,7 +77,7 @@ export default {
 		description: {
 			type: String,
 			default: '暂无描述'
-		}
+		},
 	},
 	onLoad() {
 

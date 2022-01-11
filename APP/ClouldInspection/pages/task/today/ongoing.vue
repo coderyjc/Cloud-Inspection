@@ -8,7 +8,7 @@
 			:description="item.description"
 			:receive_time="item.receiveDate"
 			:deadline="item.deadline"
-			@body-click="nav_process(i)">
+			@body-click="nav_process(item.taskId)">
 		</TaskToDoItem>
 	</view>
 </template>
@@ -24,7 +24,8 @@ export default {
 			user : {},
 			page: 0,
 			limit: 5,
-			list: []
+			list: [],
+			max: 0
 		}
 	},
 	onLoad() {
@@ -35,15 +36,19 @@ export default {
 		this.fetch_data();
 	},
 	onReachBottom() {
-		this.fetch_data();
+		if(this.page > this.max) return
+		this.fetch_data(this.page + 1);
 	},
 	methods: {
 		async fetch_data(pn){
 			await this.$u.api.taskOnGoing(this.user.userId, this.page, this.limit).then(res => {
 				this.list = this.list.concat(res.list.records)
+				this.max = res.list.pages
+				this.page += 1
 			})
 		},
 		nav_process(task_id){
+			console.log(task_id);
 			this.$u.route('/pages/task/process', {
 				id: task_id
 			})

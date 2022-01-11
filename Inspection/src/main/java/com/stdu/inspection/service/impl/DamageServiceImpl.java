@@ -96,7 +96,7 @@ public class DamageServiceImpl extends ServiceImpl<DamageMapper, Damage> impleme
         Date now = new Date();
         damage.setId(null);
         damage.setDamageType(type);
-        damage.setStatus(0);
+        damage.setStatus(1);
         damage.setLocation(location);
         damage.setPostUser(postId);
         damage.setPostDate(TimeUtils.castDateStringToDateType(TimeUtils.castDateTypeToDateString(now)));

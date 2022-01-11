@@ -33,6 +33,10 @@ const install = (Vue, vm) => {
 	let acquireTask = (userId, damageId) => vm.$u.post('/task/acquire', {damageid: damageId, id: userId})
 	// 获取用户正在进行的任务
 	let taskOnGoing = (userId, page, limit) => vm.$u.get('/task/user', {id: userId, pn: page, limit: limit}) 
+	// 根据id获取任务
+	let getTaskProcess = (taskId) => vm.$u.get('/task/process', {taskid: taskId})
+	
+	
 	
 	vm.$u.api = {
 		// Uer
@@ -42,7 +46,7 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask, taskOnGoing
+		acquireTask, taskOnGoing, getTaskProcess
 	};
 }
 
