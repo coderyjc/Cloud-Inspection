@@ -63,6 +63,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
+    public boolean insertCompletePicture(String id, String filename) {
+        return baseMapper.insertCompletePicture(id, filename);
+    }
+
+    @Override
+    public boolean submitTask(String taskId, String description) {
+        // 提交任务，直接调用存储过程
+        return baseMapper.submitTask(taskId, description);
+    }
+
+    @Override
     public IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit) {
         IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
         QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();

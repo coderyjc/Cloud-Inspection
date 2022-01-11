@@ -2,14 +2,22 @@ package com.stdu.inspection.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
 import com.stdu.inspection.utils.ConstUtil;
+import com.stdu.inspection.utils.FileUtil;
 import com.stdu.inspection.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * <p>
@@ -123,6 +131,63 @@ public class TaskController {
     ){
         IPage<TaskProcess> ipage = taskService.listTaskByUser(userId, pn, limit);
         return Msg.success().add("list", ipage);
+    }
+
+
+    /**
+     * 【提交任务】
+     * @param taskId 任务 id
+     * @return
+     */
+    @RequestMapping(value = "/submit", method = RequestMethod.POST)
+    public Msg submitTask(
+            @RequestParam(value = "id")String taskId,
+            @RequestParam(value = "description") String description
+    ){
+        boolean suc = taskService.submitTask(taskId, description);
+        return Msg.success().add("suc", suc);
+    }
+
+
+    /**
+     * 【上传提交任务的图片】
+     * @param file 图片
+     * @param id 任务id
+     * @return
+     */
+    @RequestMapping(value = "/put/{id}", method = RequestMethod.POST)
+    public Msg uploadDamageImage(
+            @RequestParam(value = "file") MultipartFile file,
+            @PathVariable(value = "id") String id
+    ) {
+        // 判空
+        if (file == null) {
+            return Msg.fail().add("msg", "请选择要上传的图片");
+        }
+        // 判断大小
+        if (file.getSize() > 1024 * 1024 * 5) {
+            return Msg.fail().add("msg", "文件大小不能大于5M");
+        }
+        //获取文件后缀
+        String suffix = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+        if (!"jpg,jpeg,gif,png".toUpperCase().contains(suffix.toUpperCase())) {
+            return Msg.fail().add("msg", "请选择jpg,jpeg,gif,png格式的图片");
+        }
+        // 目标地址
+        String destDir = ConstUtil.TASK_COMPLETE_PICTURE;
+        File file1 = new File(destDir);
+        if(!file1.exists()) file1.mkdir();
+        //通过UUID生成唯一文件名
+        String filename = UUID.randomUUID().toString().replaceAll("-","") + "." + suffix;
+        try {
+            // 保存图片
+            FileUtil.savePicture(file, destDir, filename);
+            // 向任务完成的表中插入图片
+            boolean suc = taskService.insertCompletePicture(id, filename);
+            return Msg.success().add("suc", suc);
+        } catch (Exception e) {
+            return Msg.fail();
+        }
     }
 
 

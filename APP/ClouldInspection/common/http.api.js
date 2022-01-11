@@ -35,7 +35,8 @@ const install = (Vue, vm) => {
 	let taskOnGoing = (userId, page, limit) => vm.$u.get('/task/user', {id: userId, pn: page, limit: limit}) 
 	// 根据id获取任务
 	let getTaskProcess = (taskId) => vm.$u.get('/task/process', {taskid: taskId})
-	
+	// 提交任务
+	let submitTask = (taskId, desc = '') => vm.$u.post('/task/submit', {id: taskId, description: desc})
 	
 	
 	vm.$u.api = {
@@ -46,7 +47,7 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask, taskOnGoing, getTaskProcess
+		acquireTask, taskOnGoing, getTaskProcess, submitTask
 	};
 }
 

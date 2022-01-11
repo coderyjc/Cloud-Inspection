@@ -22,6 +22,14 @@
         location, description, type, source
     </sql>
 
+    <insert id="insertCompletePicture">
+        insert into task_complete_image values(#{id}, #{filename}, NOW())
+    </insert>
+
+    <update id="submitTask">
+        CALL submitTask(#{taskId});
+    </update>
+
     <select id="getTaskProcessById" resultType="com.stdu.inspection.pojo.TaskProcess">
         select <include refid="Task_Process_List" />
         from v_task_process where task_id = #{taskId};

@@ -2,7 +2,7 @@
 	<view class="progress">
 		<view class="progress-wrap">
 			<view class="progress-info">
-				<u-steps :current="task.status" 
+				<u-steps :current="task.status-1" 
 						:list="steps" 
 						mode="dot"></u-steps>
 				<!-- 损伤图片 -->
@@ -92,8 +92,8 @@ export default {
 			})
 		},
 		submitTask(){
-			uni.navigateTo({
-				url:'/pages/task/operation/submitTask'
+			this.$u.route('/pages/task/operation/submitTask',{
+				taskid:this.task.taskId
 			})
 		},
 		cancelTask(){

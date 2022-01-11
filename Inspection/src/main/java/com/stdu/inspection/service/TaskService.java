@@ -58,4 +58,19 @@ public interface TaskService extends IService<Task> {
      */
     void insert(int damage, int user);
 
+    /**
+     * 向 task_complete_image 表中插入记录
+     * @param id 任务id
+     * @param filename 图片名称
+     * @return
+     */
+    boolean insertCompletePicture(String id, String filename);
+
+    /**
+     * 提交任务
+     * @param taskId 任务id
+     * @param description 说明
+     * @return
+     */
+    boolean submitTask(String taskId, String description);
 }

@@ -38,6 +38,6 @@ public class ConstUtil {
      */
     public static final String DAMAGE_PICTURE = BASE_ROOT + "damage_picture";
 
-
+    public static final String TASK_COMPLETE_PICTURE = BASE_ROOT + "complete";
 }
 

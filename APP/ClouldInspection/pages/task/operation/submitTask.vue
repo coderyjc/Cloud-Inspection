@@ -1,5 +1,6 @@
 <template>
 	<view class="u-demo">
+		<u-toast ref="uToast" isTab/>
 		<view class="u-demo-wrap">
 			<!-- 上传图片 -->
 			<view class="task-info">
@@ -33,7 +34,6 @@
 						@on-list-change="onListChange">
 				</u-upload>
 				<u-button :custom-style="{marginTop: '20rpx'}" @click="clear">清空列表</u-button>
-				<!-- <u-button :custom-style="{marginTop: '20rpx'}" @click="reUpload">重新上传</u-button> -->
 			</view>
 			
 			<form>
@@ -46,7 +46,7 @@
 					v-model="description" 
 					class="u-border-bottom uni-form-item textarea" placeholder="备注" />
 				</view>
-				<button type="primary">提交</button>
+				<button type="primary" @click="submitTask()">提交</button>
 			</form>
 				
 		</view>
@@ -66,15 +66,16 @@
 				// 最大上传数量
 				maxCount: 4,
 				// 组件内部的文件列表
+				description: '',
 				lists: [], 
-				// 钢轨损伤类型
-				typeIndex: 0,
-				damageLevelList:[1,2,3,4,5],
-				levelIndex: 0,
-				description: ''
+				taskid: 0
 			}
 		},
+		onLoad(options) {
+			this.taskid = options.taskid
+		},
 		onShow() {
+			this.action = 'http://127.0.0.1:8086/task/put/' + this.taskid
 		},
 		methods: {
 			bindTypePickerChange: function(e) {
@@ -103,12 +104,21 @@
 				})
 			},
 			onListChange(lists) {
-				// 当内部文件列表被加入文件、移除文件，或手动调用clear方法时触发
-				// console.log('onListChange', lists);
 				this.lists = lists;
 			},
 			beforeRemove(index, lists) {
 				return true;
+			},
+			submitTask(){
+				this.$u.api.submitTask(this.taskid).then(res => {
+					this.$refs.uToast.show({
+						title: '接单成功',
+						type: 'success',
+					})
+					setTimeout(() => {
+						this.$u.route('/pages/task/today/ongoing')
+					}, 2000)
+				})
 			}
 		}
 	}
