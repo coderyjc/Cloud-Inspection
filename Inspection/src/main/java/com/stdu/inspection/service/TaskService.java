@@ -40,7 +40,7 @@ public interface TaskService extends IService<Task> {
      * @param limit 容量
      * @return
      */
-     IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit);
+     IPage<TaskProcess> listTaskAcquiredByUser(String userId, String pn, String limit);
 
     /**
      * 2021年11月7日23:32:31
@@ -67,7 +67,8 @@ public interface TaskService extends IService<Task> {
     boolean insertCompletePicture(String id, String filename);
 
     /**
-     * 提交任务
+     * 【提交任务】
+     * 审核通过才是真正的通过
      * @param taskId 任务id
      * @param description 说明
      * @return
@@ -80,4 +81,20 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     Task deleteTaskById(String id);
+
+    /**
+     * 【获取用户正在审核的任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<TaskProcess> listTaskCheckingByUser(String userId, String pn, String limit);
+
+    /**
+     * 修改任务状态
+     * @param status 新状态
+     * @return
+     */
+    boolean updateTaskStatus(String taskId, int status);
 }

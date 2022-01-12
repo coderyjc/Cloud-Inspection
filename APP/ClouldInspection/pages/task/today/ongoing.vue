@@ -2,12 +2,12 @@
 	<view class="todo">
 		<TaskToDoItem
 			v-for="(item,index) in list"
-			:time="item.postDate"
+			:time="item.postDate  | timeFormat"
 			:source="item.source"
 			:type="item.type"
 			:description="item.description"
-			:receive_time="item.receiveDate"
-			:deadline="item.deadline"
+			:receive_time="item.receiveDate | timeFormat"
+			:deadline="item.deadline | timeFormat"
 			@body-click="nav_process(item.taskId)">
 		</TaskToDoItem>
 	</view>
@@ -15,6 +15,7 @@
 
 <script>
 import TaskToDoItem from '../component/TaskToDoItem.vue'
+import {getTime} from '../../../utils/timeutil.js'
 export default {
 	components: {
 		TaskToDoItem
@@ -36,15 +37,20 @@ export default {
 		this.fetch_data();
 	},
 	onReachBottom() {
-		if(this.page > this.max) return
+		if(this.page >= this.max) return
 		this.fetch_data(this.page + 1);
+	},
+	filters:{
+		timeFormat(time){
+			return getTime(time)
+		}
 	},
 	methods: {
 		async fetch_data(pn){
 			await this.$u.api.taskOnGoing(this.user.userId, this.page, this.limit).then(res => {
 				this.list = this.list.concat(res.list.records)
 				this.max = res.list.pages
-				this.page += 1
+				this.page = res.list.current
 			})
 		},
 		nav_process(task_id){

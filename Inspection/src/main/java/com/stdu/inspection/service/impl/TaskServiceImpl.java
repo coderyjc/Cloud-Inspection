@@ -83,7 +83,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
-    public IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit) {
+    public IPage<TaskProcess> listTaskCheckingByUser(String userId, String pn, String limit) {
+        IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
+        QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();
+        wrapper.eq("receiver", Integer.parseInt(userId));
+        wrapper.eq("status", ConstUtil.TASK_COMMIT);
+        return baseMapper.listTaskByProcess(iPage, wrapper);
+    }
+
+    @Override
+    public boolean updateTaskStatus(String taskId, int status) {
+        Task task = new Task();
+        if(status == ConstUtil.TASK_COMMIT) {
+            task.setSubmitDate(new Date());
+        }
+        return task.setTaskId(Integer.parseInt(taskId)).setStatus(status).updateById();
+    }
+
+    @Override
+    public IPage<TaskProcess> listTaskAcquiredByUser(String userId, String pn, String limit) {
         IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
         QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();
         wrapper.eq("receiver", Integer.parseInt(userId));

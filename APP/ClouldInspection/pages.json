@@ -154,7 +154,7 @@
             "path" : "pages/damage/inspect",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "巡检",
                 "enablePullDownRefresh": false
             }
             
@@ -163,7 +163,7 @@
             "path" : "pages/task/today/checking",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "正在审核",
                 "enablePullDownRefresh": false
             }
             

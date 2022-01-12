@@ -24,7 +24,7 @@ public class ConstUtil {
     // 任务状态-任务已提交
     public static final int TASK_COMMIT = 2;
 
-    // 任务状态-任务已完成
+    // 任务状态-任务已(审核)完成
     public static final int TASK_COMPLETE = 3;
 
     /**

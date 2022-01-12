@@ -118,25 +118,26 @@ public class TaskController {
 
 
     /**
-     * 分页获取用户已经接单的任务列表
+     * 【分页获取用户已经接单的任务列表】
      * @param userId 用户id
      * @param pn 页码
      * @param limit 容量
      * @return
      */
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public Msg listTaskByUser(
+    @RequestMapping(value = "/user/acquire", method = RequestMethod.GET)
+    public Msg listTaskAcquiredByUser(
             @RequestParam(value = "id") String userId,
             @RequestParam(value = "pn", defaultValue = "1") String pn,
             @RequestParam(value = "limit", defaultValue = "5") String limit
     ){
-        IPage<TaskProcess> ipage = taskService.listTaskByUser(userId, pn, limit);
+        IPage<TaskProcess> ipage = taskService.listTaskAcquiredByUser(userId, pn, limit);
         return Msg.success().add("list", ipage);
     }
 
 
     /**
-     * 【提交任务】
+     * 【提交任务以审核】
+     * 设置任务的status 位 TASK_COMMIT
      * @param taskId 任务 id
      * @return
      */
@@ -145,7 +146,7 @@ public class TaskController {
             @RequestParam(value = "id")String taskId,
             @RequestParam(value = "description") String description
     ){
-        boolean suc = taskService.submitTask(taskId, description);
+        boolean suc = taskService.updateTaskStatus(taskId, ConstUtil.TASK_COMMIT);
         return Msg.success().add("suc", suc);
     }
 
@@ -209,6 +210,24 @@ public class TaskController {
         damageService.updateDamageStatus(task.getDamageId(), ConstUtil.DAMAGE_REPAIRING);
         return Msg.success();
     }
+
+    /**
+     * 【获取用户正在审核的任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/user/checking", method = RequestMethod.GET)
+    public Msg listTaskCheckingByUser(
+            @RequestParam(value = "id") String userId,
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "5") String limit
+    ){
+        IPage<TaskProcess> ipage = taskService.listTaskCheckingByUser(userId, pn, limit);
+        return Msg.success().add("list", ipage);
+    }
+
 
 }
 

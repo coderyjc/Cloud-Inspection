@@ -4,7 +4,6 @@
 			<u-card :border-radius="40" style="margin: 0;" :foot-border-top="false" @click="nav_progress">
 				<!-- 头部信息 -->
 				<view class="card-head" slot="head">
-					<text class="card-head-text" v-if="submit_date != '' ">{{deadline}} 截止</text>
 					<view class="tag-group">
 						<u-tag :text="typeList[type-1]" mode="light" />
 						<u-tag :text="sourceList[source]" mode="light" />
@@ -42,6 +41,14 @@
 								</view>
 							</template>
 						</u-time-line-item>
+						<u-time-line-item  nodeTop="2">
+							<template v-slot:content>
+								<view>
+									<view class="u-order-title">正在审核</view>
+									<view class="u-order-time" >{{ submit_date }}</view>
+								</view>
+							</template>
+						</u-time-line-item>
 					</u-time-line>
 				</view>
 			</u-card>
@@ -51,7 +58,7 @@
 
 <script>
 export default {
-	name: "TaskToDoItem",
+	name: "TaskCheckingItem",
 	data() {
 		return {
 			typeList: ['未知', '掉块','裂纹', '擦伤'],

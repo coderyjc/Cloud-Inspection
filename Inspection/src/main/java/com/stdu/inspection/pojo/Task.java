@@ -52,6 +52,11 @@ public class Task extends Model<Task> {
     private Date receiveDate;
 
     /**
+     * 用户提交但是还没有审核成功的时间
+     */
+    private Date submitDate;
+
+    /**
      * 截止日期
      */
     private Date deadline;

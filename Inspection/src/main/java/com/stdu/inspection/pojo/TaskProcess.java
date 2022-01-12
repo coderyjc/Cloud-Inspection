@@ -26,6 +26,8 @@ public class TaskProcess {
 
     private Date deadline;
 
+    private Date submitDate;
+
     private Integer status;
 
     private Integer receiver;

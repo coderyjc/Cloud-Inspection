@@ -8,18 +8,19 @@
         <result column="damage_id" property="damageId" />
         <result column="receiver" property="receiver" />
         <result column="receive_date" property="receiveDate" />
+        <result column="submit_date" property="submitDate" />
         <result column="deadline" property="deadline" />
         <result column="status" property="status" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        task_id, damage_id, receiver, receive_date, deadline, status
+        task_id, damage_id, receiver, receive_date, submit_date, deadline, status
     </sql>
 
     <sql id="Task_Process_List">
         task_id, damage_id, status, receiver, receive_date, deadline, post_date,
-        location, description, type, source
+        submit_date, location, description, type, source
     </sql>
 
     <insert id="insertCompletePicture">
