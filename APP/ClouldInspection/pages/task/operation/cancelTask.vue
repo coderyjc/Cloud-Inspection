@@ -1,28 +1,18 @@
 <template>
 	<view class="u-demo">
+		<u-toast ref="uToast" isTab/>
 		<view class="u-demo-wrap">
 			<form>
 				<view class="uni-list">
-			<!-- 损伤类型 -->
-					<view class="uni-list-cell">
-						<view class="uni-list-cell-left">
-							原因
-						</view>
-						<view class="uni-list-cell-db">
-							<picker @change="bindPickerChange" :value="index" :range="typeList" range-key="typeName">
-								<label class="uni-input">{{typeList[index].typeName}}</label>
-							</picker>
-						</view>
-					</view>
 			<!-- 描述 -->
 					<u-input 
 					type="textarea" 
 					:border="true"
 					height="inputHeight" 
 					v-model="description" 
-					class="u-border-bottom uni-form-item textarea" placeholder="备注" />
+					class="u-border-bottom uni-form-item textarea" placeholder="说明原因" />
 				</view>
-				<button type="primary">提交</button>
+				<button type="primary" @click="cancelTask()">提交</button>
 			</form>
 				
 		</view>
@@ -33,33 +23,33 @@
 	export default {
 		data() {
 			return {
-				typeList: [
-					{
-						typeId: "1",
-						typeName: "超出能力范围"
-					},
-					{
-						typeId: "2",
-						typeName: "路遇突发情况"
-					},
-					{
-						typeId: "3",
-						typeName: "时间不够"
-					},
-					{
-						typeId: "4",
-						typeName: "工具不够"
-					},
-				],
-				index: 0,
+				task_id: 0,
 				description: ''
 			}
 		},
-		onShow() {
+		onLoad(options) {
+			console.log(options);
+			this.task_id = options.taskid
 		},
 		methods: {
-			bindPickerChange: function(e) {
-				this.index = e.detail.value
+			cancelTask(){
+				console.log(this.task_id);
+				if(this.description < 10){
+					this.$refs.uToast.show({
+						title: '字数不得少于10',
+						type: 'error',
+					})
+					return
+				}
+				this.$u.api.cancelTask(this.task_id, this.description).then(res => {
+					this.$refs.uToast.show({
+						title: '取消成功',
+						type: 'success',
+					})
+					setTimeout(() => {
+						this.$u.route('/pages/task/today/ongoing')
+					}, 2000)
+				})
 			}
 		}
 	}

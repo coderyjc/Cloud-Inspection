@@ -74,6 +74,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
+    public Task deleteTaskById(String id) {
+        Task task = new Task();
+        task.setTaskId(Integer.parseInt(id));
+        task = task.selectById();
+        task.deleteById();
+        return task;
+    }
+
+    @Override
     public IPage<TaskProcess> listTaskByUser(String userId, String pn, String limit) {
         IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
         QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();

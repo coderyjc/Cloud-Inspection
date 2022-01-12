@@ -96,7 +96,8 @@ public class TaskController {
 
 
     /**
-     * 【接单，用户接收巡检任务，向任务表中插入一条数据】
+     * 【接单，用户接收巡检任务】
+     *  向任务表中插入一条数据
      * @param damageId 损伤id
      * @param userId 接收用户的用户id
      * @return
@@ -190,6 +191,24 @@ public class TaskController {
         }
     }
 
+
+    /**
+     * 【取消任务】
+     * @param id 任务id
+     * @param reason 原因
+     * @return
+     */
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public Msg cancelTask(
+            @RequestParam(value = "taskid") String id,
+            @RequestParam(value = "desc")String reason
+    ){
+        // 从任务表中删除这个记录
+        Task task = taskService.deleteTaskById(id);
+        // 修改damage表中这个损伤的damage
+        damageService.updateDamageStatus(task.getDamageId(), ConstUtil.DAMAGE_REPAIRING);
+        return Msg.success();
+    }
 
 }
 

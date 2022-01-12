@@ -37,7 +37,8 @@ const install = (Vue, vm) => {
 	let getTaskProcess = (taskId) => vm.$u.get('/task/process', {taskid: taskId})
 	// 提交任务
 	let submitTask = (taskId, desc = '') => vm.$u.post('/task/submit', {id: taskId, description: desc})
-	
+	// 取消任务
+	let cancelTask = (taskId, reason = '') => vm.$u.post('/task/cancel', {taskid:taskId, desc:reason})
 	
 	vm.$u.api = {
 		// Uer
@@ -47,7 +48,7 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask, taskOnGoing, getTaskProcess, submitTask
+		acquireTask, taskOnGoing, getTaskProcess, submitTask, cancelTask
 	};
 }
 

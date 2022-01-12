@@ -73,4 +73,11 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     boolean submitTask(String taskId, String description);
+
+    /**
+     * 由id 删除task中的记录，如果删除成功，则返回刚刚删除的数据
+     * @param id 任务id
+     * @return
+     */
+    Task deleteTaskById(String id);
 }

@@ -97,13 +97,13 @@ export default {
 			})
 		},
 		cancelTask(){
-			uni.navigateTo({
-				url:'/pages/task/operation/cancelTask'
+			this.$u.route('/pages/task/operation/cancelTask',{
+				taskid:this.task.taskId
 			})
 		},
 		delayTask(){
-			uni.navigateTo({
-				url:'/pages/task/operation/delayTask'
+			this.$u.route('/pages/task/operation/delayTask',{
+				taskid:this.task.taskId
 			})
 		}
 	}
