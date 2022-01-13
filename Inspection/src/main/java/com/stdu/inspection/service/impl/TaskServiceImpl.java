@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.mapper.TaskMapper;
+import com.stdu.inspection.pojo.TaskComplete;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.TaskService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stdu.inspection.utils.ConstUtil;
+import com.stdu.inspection.utils.TimeUtils;
+import org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -98,6 +101,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             task.setSubmitDate(new Date());
         }
         return task.setTaskId(Integer.parseInt(taskId)).setStatus(status).updateById();
+    }
+
+    @Override
+    public IPage<TaskComplete> listTaskCompleteByUserToday(String userId, String pn, String limit) {
+        IPage<TaskComplete> iPage = new Page<>(Integer.parseInt(pn), Integer.parseInt(limit));
+        QueryWrapper<TaskComplete> wrapper = new QueryWrapper<>();
+        wrapper.eq("receiver", userId);
+        String time =
+                TimeUtils.castDateTypeToDateString(TimeUtils.localToUTC(TimeUtils.getCurrentTimeString()));
+        wrapper.like("submit_date",time.substring(0, 10));
+        return baseMapper.listTaskComplete(iPage, wrapper);
+    }
+
+    @Override
+    public IPage<TaskComplete> listTaskCompleteByUserAll(String userId, String pn, String limit) {
+        IPage<TaskComplete> iPage = new Page<>(Integer.parseInt(pn), Integer.parseInt(limit));
+        QueryWrapper<TaskComplete> wrapper = new QueryWrapper<>();
+        wrapper.eq("receiver", userId);
+        return baseMapper.listTaskComplete(iPage, wrapper);
     }
 
     @Override

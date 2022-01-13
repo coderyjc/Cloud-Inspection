@@ -42,6 +42,11 @@ const install = (Vue, vm) => {
 	let cancelTask = (taskId, reason = '') => vm.$u.post('/task/cancel', {taskid:taskId, desc:reason})
 	// 获取正在审核的任务
 	let listTaskChecking = (userId, page, limit) => vm.$u.get('/task/user/checking', {id: userId, pn: page, limit: limit}) 
+	// 获取用户今日审核完成的任务
+	let listCompleteTaskToday = (userId, page, limit) => vm.$u.get('/task/user/complete/today', {id: userId, pn: page, limit: limit})
+	// 获取用户全部审核完成的任务
+	let listCompleteTaskAll = (userId, page, limit) => vm.$u.get('/task/user/complete/all', {id: userId, pn: page, limit: limit})
+	
 	
 	
 	vm.$u.api = {
@@ -52,7 +57,8 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask, taskOnGoing, getTaskProcess, submitTask, cancelTask, listTaskChecking
+		acquireTask, taskOnGoing, getTaskProcess, submitTask, cancelTask, listTaskChecking,
+		listCompleteTaskToday, listCompleteTaskAll
 	};
 }
 

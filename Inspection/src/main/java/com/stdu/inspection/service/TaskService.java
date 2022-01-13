@@ -3,6 +3,7 @@ package com.stdu.inspection.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.stdu.inspection.pojo.Task;
+import com.stdu.inspection.pojo.TaskComplete;
 import com.stdu.inspection.pojo.TaskProcess;
 
 /**
@@ -97,4 +98,23 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     boolean updateTaskStatus(String taskId, int status);
+
+    /**
+     * 【获取用户今日审核完成的任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<TaskComplete> listTaskCompleteByUserToday(String userId, String pn, String limit);
+
+
+    /**
+     * 【获取用户审核完成的全部任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<TaskComplete> listTaskCompleteByUserAll(String userId, String pn, String limit);
 }

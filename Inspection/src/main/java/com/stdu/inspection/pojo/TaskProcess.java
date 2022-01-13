@@ -41,4 +41,5 @@ public class TaskProcess {
     private Integer type;
 
     private Integer source;
+
 }

@@ -38,6 +38,9 @@ public class ConstUtil {
      */
     public static final String DAMAGE_PICTURE = BASE_ROOT + "damage_picture";
 
+    /**
+     * 修复完成用于验收的图片的文件夹
+     */
     public static final String TASK_COMPLETE_PICTURE = BASE_ROOT + "complete";
 }
 

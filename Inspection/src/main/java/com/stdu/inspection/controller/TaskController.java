@@ -4,6 +4,7 @@ package com.stdu.inspection.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.pojo.Task;
+import com.stdu.inspection.pojo.TaskComplete;
 import com.stdu.inspection.pojo.TaskProcess;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
@@ -225,6 +226,40 @@ public class TaskController {
             @RequestParam(value = "limit", defaultValue = "5") String limit
     ){
         IPage<TaskProcess> ipage = taskService.listTaskCheckingByUser(userId, pn, limit);
+        return Msg.success().add("list", ipage);
+    }
+
+    /**
+     * 【获取用户今日审核完成的任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/user/complete/today", method = RequestMethod.GET)
+    public Msg listTaskCompleteByUserToday(
+            @RequestParam(value = "id") String userId,
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "5") String limit
+    ){
+        IPage<TaskComplete> ipage = taskService.listTaskCompleteByUserToday(userId, pn, limit);
+        return Msg.success().add("list", ipage);
+    }
+
+    /**
+     * 【获取用户审核完成的全部任务列表】
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/user/complete/all", method = RequestMethod.GET)
+    public Msg listTaskCompleteByUserAll(
+            @RequestParam(value = "id") String userId,
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "5") String limit
+    ){
+        IPage<TaskComplete> ipage = taskService.listTaskCompleteByUserAll(userId, pn, limit);
         return Msg.success().add("list", ipage);
     }
 

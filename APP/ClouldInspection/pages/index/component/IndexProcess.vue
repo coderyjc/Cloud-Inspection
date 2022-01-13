@@ -27,7 +27,7 @@
 			</u-grid-item>
 			<u-grid-item @click="nav_hasComplete()">
 				<u-icon name="checkmark" color="#00b894" size="58"></u-icon>
-				<view class="grid-text">维修完成</view>
+				<view class="grid-text">今日完成</view>
 			</u-grid-item>
 		</u-grid>
 	</view>
