@@ -14,17 +14,6 @@
 							</picker>
 						</view>
 					</view>
-			<!-- 损伤类型 -->
-					<view class="uni-list-cell">
-						<view class="uni-list-cell-left">
-							原因
-						</view>
-						<view class="uni-list-cell-db">
-							<picker @change="bindReasonPickerChange" :value="reasonIndex" :range="typeList" range-key="typeName">
-								<label class="uni-input">{{typeList[reasonIndex].typeName}}</label>
-							</picker>
-						</view>
-					</view>
 			<!-- 描述 -->
 					<u-input 
 					type="textarea" 
@@ -33,7 +22,7 @@
 					v-model="description" 
 					class="u-border-bottom uni-form-item textarea" placeholder="备注" />
 				</view>
-				<button type="primary">提交</button>
+				<button type="primary" @click="submit()">提交</button>
 			</form>
 				
 		</view>
@@ -44,38 +33,20 @@
 	export default {
 		data() {
 			return {
-				typeList: [
-					{
-						typeId: "0",
-						typeName: "任性"
-					},
-					{
-						typeId: "1",
-						typeName: "超出能力范围"
-					},
-					{
-						typeId: "2",
-						typeName: "路遇突发情况"
-					},
-					{
-						typeId: "3",
-						typeName: "时间不够"
-					},
-					{
-						typeId: "4",
-						typeName: "工具不够"
-					},
-				],
-				reasonIndex: 0,
+				task_id: 0,
 				timeList: [
 				{
-					duration:'1小时'
+					duration:'1小时',
+					delay: 1
 				},{
-					duration:'2小时'
+					duration:'2小时',
+					delay: 2
 				},{
-					duration:'5小时'
+					duration:'5小时',
+					delay: 5
 				},{
-					duration:'1天'
+					duration:'1天',
+					delay: 24
 				}],
 				timeIndex: 0,
 				description: ''
@@ -83,13 +54,18 @@
 		},
 		onShow() {
 		},
+		onLoad(options) {
+			this.task_id = options.taskid
+		},
 		methods: {
-			bindReasonPickerChange: function(e) {
-				this.reasonIndex = e.detail.value
-			},
 			bindTimePickerChange: function(e) {
 				this.timeIndex = e.detail.value
 			},
+			submit(){
+				this.$u.api.delayTask(this.task_id, this.timeList[this.timeIndex].delay, this.description).then(res => {
+					console.log(res);
+				})
+			}
 		}
 	}
 </script>

@@ -263,6 +263,21 @@ public class TaskController {
         return Msg.success().add("list", ipage);
     }
 
+    /**
+     * 任务延期
+     * @param taskId 任务id
+     * @param time 延期时长
+     * @return
+     */
+    @RequestMapping(value = "/delay", method = RequestMethod.POST)
+    public Msg delayTask(
+            @RequestParam(value = "id") String taskId,
+            @RequestParam(value = "delay")String time,
+            @RequestParam(value = "description")String description
+    ){
+        boolean suc = taskService.delayTask(taskId, time, description);
+        return Msg.success().add("suc", suc);
+    }
 
 }
 

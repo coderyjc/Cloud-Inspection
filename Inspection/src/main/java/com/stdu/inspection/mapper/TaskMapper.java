@@ -27,4 +27,6 @@ public interface TaskMapper extends BaseMapper<Task> {
     boolean submitTask(String taskId, String description);
 
     IPage<TaskComplete> listTaskComplete(IPage<TaskComplete> iPage, Wrapper ew);
+
+    void delayTask(String taskId, String time, String description);
 }

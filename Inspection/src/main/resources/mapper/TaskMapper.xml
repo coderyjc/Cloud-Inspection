@@ -36,6 +36,10 @@
         CALL submitTask(#{taskId}, #{description});
     </update>
 
+    <insert id="delayTask">
+        insert into task_delay values (#{taskId}, #{time}, #{description});
+    </insert>
+
     <select id="getTaskProcessById" resultType="com.stdu.inspection.pojo.TaskProcess">
         select <include refid="Task_Process_List" />
         from v_task_process where task_id = #{taskId};

@@ -117,4 +117,13 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     IPage<TaskComplete> listTaskCompleteByUserAll(String userId, String pn, String limit);
+
+    /**
+     * 【任务延期】
+     * @param taskId 任务id
+     * @param time 时间
+     * @param description 原因
+     * @return
+     */
+    boolean delayTask(String taskId, String time, String description);
 }

@@ -1,5 +1,6 @@
 package com.stdu.inspection.service.impl;
 
+import com.alibaba.druid.sql.ast.statement.SQLAlterTableDisableKeys;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -120,6 +121,18 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         QueryWrapper<TaskComplete> wrapper = new QueryWrapper<>();
         wrapper.eq("receiver", userId);
         return baseMapper.listTaskComplete(iPage, wrapper);
+    }
+
+    @Override
+    public boolean delayTask(String taskId, String time, String description) {
+        Task task = new Task();
+        task.setTaskId(Integer.parseInt(taskId));
+        task = task.selectById();
+        int ori = Integer.parseInt(time);
+        long after = task.getDeadline().getTime() + ori * 3600000L;
+        task.setDeadline(new Date(after));
+        baseMapper.delayTask(taskId, time, description);
+        return task.updateById();
     }
 
     @Override

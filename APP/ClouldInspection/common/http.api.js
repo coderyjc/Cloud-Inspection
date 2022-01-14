@@ -36,6 +36,8 @@ const install = (Vue, vm) => {
 	let taskOnGoing = (userId, page, limit) => vm.$u.get('/task/user/acquire', {id: userId, pn: page, limit: limit}) 
 	// 根据id获取任务
 	let getTaskProcess = (taskId) => vm.$u.get('/task/process', {taskid: taskId})
+	// 任务延迟
+	let delayTask = (taskId, time, desc) => vm.$u.post('/task/delay', {id: taskId, delay:time, description: desc})
 	// 提交任务
 	let submitTask = (taskId, desc = '') => vm.$u.post('/task/submit', {id: taskId, description: desc})
 	// 取消任务
@@ -57,7 +59,7 @@ const install = (Vue, vm) => {
 		// Picture
 		getPicture,
 		// Task
-		acquireTask, taskOnGoing, getTaskProcess, submitTask, cancelTask, listTaskChecking,
+		acquireTask, taskOnGoing, getTaskProcess, submitTask, cancelTask, delayTask, listTaskChecking,
 		listCompleteTaskToday, listCompleteTaskAll
 	};
 }
