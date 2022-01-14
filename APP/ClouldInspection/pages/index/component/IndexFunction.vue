@@ -19,15 +19,6 @@
 				巡检
 			</view>
 		</view>		
-		<!-- 报警 -->
-		<view class="function-item" @click="nav_alart()">
-			<view class="item-icon">
-				<u-icon name="bell" color="#d63031" size="58"></u-icon>
-			</view>
-			<view class="item-name">
-				报警
-			</view>
-		</view>
 	</view>
 </template>
 

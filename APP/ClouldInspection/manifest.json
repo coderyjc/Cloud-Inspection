@@ -57,7 +57,8 @@
             },
             /* ios打包配置 */
             "ios" : {
-                "UIBackgroundModes" : [ "audio" ]
+                "UIBackgroundModes" : [ "audio" ],
+                "idfa" : true
             },
             /* SDK配置 */
             "sdkConfigs" : {
@@ -139,6 +140,9 @@
         "router" : {
             "mode" : "history",
             "base" : "/h5/"
+        },
+        "sdkConfigs" : {
+            "maps" : {}
         }
     },
     "vueVersion" : "2"
