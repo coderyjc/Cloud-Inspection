@@ -77,6 +77,11 @@
 							// 记住密码的情况下向缓存中写入密码, 登录的时候就直接填充
 							uni.setStorageSync('login', userLogin)
 						}
+						
+						uni.switchTab({
+							url: '/pages/home/home'
+						})
+						
 					}
 					
 					this.$refs.uToast.show({

@@ -1,44 +1,44 @@
 ﻿{
   "data": [
     {
-      "id": "23134",
-      "carno": "川A23521",
-      "company": "xxxxx厂",
-      "content": "xxxxx",
-      "speed": "68",
-      "load": "6000KG"
+      "id": "10001",
+      "carno": "10001",
+      "company": "铁道大学",
+      "content": "正常",
+      "speed": "20",
+      "load": "2KG"
     },
     {
-      "id": "72631",
-      "carno": "川C23412",
-      "company": "xxxxx厂",
-      "content": "xxxxx",
-      "speed": "68",
-      "load": "6000KG"
+      "id": "10002",
+      "carno": "10002",
+      "company": "铁道大学",
+      "content": "正常",
+      "speed": "18",
+      "load": "2KG"
     },
     {
-      "id": "12343",
-      "carno": "川A32D1",
-      "company": "xxxxx厂",
-      "content": "xxxxx",
-      "speed": "68",
-      "load": "6000KG"
+      "id": "10003",
+      "carno": "10003",
+      "company": "铁道大学",
+      "content": "正常",
+      "speed": "20",
+      "load": "2KG"
     },
     {
-      "id": "5231",
-      "carno": "川A92342",
-      "company": "xxxxx厂",
-      "content": "xxxxx",
-      "speed": "68",
-      "load": "6000KG"
+      "id": "10004",
+      "carno": "10004",
+      "company": "铁道大学",
+      "content": "正常",
+      "speed": "19",
+      "load": "2KG"
     },
    {
-      "id": "5231",
-      "carno": "川A92342",
-      "company": "xxxxx厂",
-      "content": "xxxxx",
-      "speed": "68",
-      "load": "6000KG"
+      "id": "10005",
+      "carno": "10005",
+      "company": "铁道大学",
+      "content": "正常",
+      "speed": "20",
+      "load": "2KG"
     }
 
   ]

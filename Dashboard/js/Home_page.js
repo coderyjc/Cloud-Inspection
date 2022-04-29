@@ -2,15 +2,9 @@
  * Created by Administrator on 2017/10/26.
  */
 
-
-//    Xabin
-
-
-
-
 //应急事件处置
 $(".message_scroll").click(function () {
-    EventClick();
+    //EventClick();
     eventHandle();
 });
 

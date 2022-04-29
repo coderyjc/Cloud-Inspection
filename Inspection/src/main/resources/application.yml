@@ -1,5 +1,6 @@
 jar:
-  fileUrl: C:/Users/Administrator/Pictures/webstatic
+  fileUrl: /home/jancoyan/springbootApp/inspection/webstatic
+#  fileUrl: C:/Users/Administrator/Pictures/webstatic
 
 spring:
   datasource:
@@ -25,7 +26,7 @@ spring:
       max-request-size: 50MB
 
 server:
-  port: 8086
+  port: 8890
   max-http-header-size: 1MB
 
 logging:

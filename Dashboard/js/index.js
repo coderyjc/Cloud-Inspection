@@ -3120,7 +3120,7 @@ function AnQuan(){
             },
             legend: {
                 x: 'center',
-                data: ["案件趋势分析"],
+                data: ["年度损伤分析"],
                 textStyle:{
                     color:"#e9ebee"
 
@@ -3149,7 +3149,7 @@ function AnQuan(){
                     type: "log",
                     name: "y",
                     splitLine:{show: false},
-                    data : ['10','30','50','70','90','110','120','130','150','170','190','210','250'],
+                    data : ['0','1','2','70','90','110','120','130','150','170','190','210','250'],
                     axisLabel : {
 
                         textStyle: {
@@ -3163,9 +3163,9 @@ function AnQuan(){
             calculable: false,
             series: [
                 {
-                    name: "案件趋势分析",
+                    name: "年度损伤分析",
                     type: "line",
-                    data:[26, 59, 90, 26, 28, 70, 175, 182, 48, 188, 60, 23],
+                    data:[12, 18, 6, 2],
                     itemStyle: {
                         normal: {
                             color:"#0aabff"

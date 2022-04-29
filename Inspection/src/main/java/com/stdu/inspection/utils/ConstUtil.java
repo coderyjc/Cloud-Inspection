@@ -31,7 +31,8 @@ public class ConstUtil {
      * 项目的静态资源所在的根目录
      * 比如 图片文件夹 等
      */
-    private static final String BASE_ROOT = "C:\\Users\\Administrator\\Pictures\\webstatic\\";
+    private static final String BASE_ROOT = "/home/jancoyan/springbootApp/inspection/webstatic/";
+//    private static final String BASE_ROOT = "C:\\Users\\Administrator\\Pictures\\webstatic\\";
 
     /**
      * 损伤图片存放的文件夹

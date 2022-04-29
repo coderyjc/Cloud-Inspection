@@ -1,5 +1,6 @@
 // 后端的服务器地址
-let BACKEND_BASE_URL = 'http://localhost:8086'
+// let BACKEND_BASE_URL = 'http://localhost:8086'
+let BACKEND_BASE_URL = 'http://101.201.64.102:8890'
 
 const install = (Vue, vm) => {
 

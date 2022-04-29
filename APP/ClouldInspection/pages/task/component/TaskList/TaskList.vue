@@ -1,5 +1,6 @@
 <template>
 	<view class="task-list">
+		<u-back-top :scroll-top="scrollTop"></u-back-top>
 		<scroll-view 
 			scroll-y style="height: calc(100vh - var(--window-top) - var(--window-bottom))"
 			refresher-enabled="true" 
@@ -12,10 +13,14 @@
 			<u-toast ref="uToast" />
 			
 			<TaskItem 
-				v-for="(item) in [1, 2, 3, 4, 5]" 
-				margin="8px" 
-				padding="10" 
-				@body-click="nav_details"></TaskItem>
+				v-for="(item,index) in taskList" 
+				margin="8px"
+				padding="10"
+				:time="item.postDate"
+				:source="item.postSource"
+				:type="item.damageTypeId"
+				:description="item.description"
+				@body-click="nav_details(item.id)"></TaskItem>
 			
 			<u-loadmore 
 				:status="loadStatus" 
@@ -35,6 +40,13 @@
 		},
 		data() {
 			return {
+				// 页面相关
+				scrollTop: 0,
+				// 数据相关
+				taskList: [],
+				pn: 1,
+				limit: 5,
+				// 刷新相关
 				triggered: true,
 				_freshing: false,
 				loadStatus: 'loading',
@@ -45,19 +57,40 @@
 				}
 			}
 		},
+		onPageScroll(e) {
+			this.scrollTop = e.scrollTop;
+		},
 		onLoad() {
 			// 必须在这初始化
 			this._freshing = false
 			this.triggered = true
 		},
+		mounted() {
+			// 网络请求等
+			this.get_data(this.pn, this.limit)
+		},
 		methods: {
-			nav_details() {
-				this.$u.route('/pages/damage/damageDetail')
+			nav_details(id) {
+				this.$u.route('/pages/damage/damageDetail', {
+					id: id
+				})
 			},
+			async get_data(pn, limit){
+				await this.$u.api.getDamageList(pn, limit).then(res => {
+					this.taskList = this.taskList.concat(res.list.records)
+				})
+			}, 
+			async get_latest_data(){
+				await this.$u.api.getDamageList(1, 5).then(res => {
+					this.taskList = res.list.records
+				})
+			}, 
 			onRefresh() {
 				if(this._freshing == true) return
 				if(this.triggered == false) this.triggered = true
 				this._freshing = true
+				// 清空数据
+				this.get_latest_data()
 				setTimeout(() => {
 					this.triggered = false;
 					this._freshing = false;
@@ -73,7 +106,10 @@
 			},
 			reachBottom() {
 				this.loadStatus = 'loading'
-				// console.log("触底了")
+				// 拉取数据
+				this.pn += 1
+				this.get_data(this.pn, this.limit)
+				this.loadStatus = 'loadmore'
 			},
 		}
 	}

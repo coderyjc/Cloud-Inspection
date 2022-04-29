@@ -17,7 +17,7 @@
 				@transition="transition" 
 				@animationfinish="animationfinish">
 				<swiper-item class="swiper-item">
-					<TaskList></TaskList>
+					<TaskList class="task-list"></TaskList>
 				</swiper-item>
 				<swiper-item class="swiper-item">
 					<ProcessList></ProcessList>
@@ -109,8 +109,13 @@ page {
 	}
 	.swiper-item {
 		height: 100%;
+		width: 100%;
 		display: flex;
 		
+	}
+	
+	.task-list{
+		width: 100%;
 	}
 	
 </style>

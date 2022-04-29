@@ -14,7 +14,7 @@
 				<view class="card-body" slot="body">
 					<view class="card-left">
 						<!-- 图片 -->
-						<image src="../../../static/empty/数据为空.png" mode="aspectFill"></image>
+						<image src="../../../static/empty/data_empty.png" mode="aspectFill"></image>
 					</view>
 					<view class="card-right">
 						<!-- 备注 -->

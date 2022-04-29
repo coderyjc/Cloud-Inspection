@@ -25,7 +25,10 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.
                 addResourceHandler("/static/**").
-                addResourceLocations("classpath:/static/", "file:C:/Users/Administrator/Pictures/webstatic/");
+                addResourceLocations("classpath:/static/", "file:/home/jancoyan/springbootApp" +
+                        "/inspection/webstatic/");
+//                addResourceLocations("classpath:/static/", "file:C:/Users/Administrator/Pictures/webstatic/");
+
     }
 
 

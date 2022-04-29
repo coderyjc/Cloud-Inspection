@@ -89,7 +89,7 @@ export default {
 		},
 		picture: {
 			type: String,
-			default: '../../../static/empty/数据为空.png'
+			default: '../../../static/empty/data_empty.png'
 		},
 		description: {
 			type: String,

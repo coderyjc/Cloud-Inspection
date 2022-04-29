@@ -63,12 +63,12 @@
 	export default {
 		data() {
 			return {
-				buttonText: "点击获取位置",
+				buttonText: "114.503931 38.083314",
 				markers: [{}, {}, {}],
 				poisdatas: [{}, {}, {}],
 				title: 'map',
-				latitude: 0,
-				longitude: 0,
+				latitude: 38.083314,
+				longitude: 114.503931,
 				// 用户信息
 				user: {},
 				// 上传图片的地址
@@ -120,7 +120,8 @@
 			if(user != null && user != '' && user != undefined){
 				this.user = user
 			}
-			this.action = 'http://127.0.0.1:8086/damage_image/put/' + user.userId
+			// this.action = 'http://127.0.0.1:8086/damage_image/put/' + user.userId
+			this.action = 'http://101.201.64.102:8890/damage_image/put/1'
 		},
 		methods: {
 			getLocation() {
@@ -169,7 +170,10 @@
 			},
 			// 提交
 			formSubmit(){
+				this.latitude = 38.083314
+				this.longitude = 114.503931
 				let location = this.longitude+','+this.latitude
+				
 				if(location.length < 10){
 					this.$refs.uToast.show({
 						title: '位置获取失败',

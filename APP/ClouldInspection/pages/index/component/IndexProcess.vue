@@ -17,12 +17,10 @@
 		<u-grid :col="3">
 			<u-grid-item @click="nav_outOfTime()">
 				<u-icon name="clock" color="#d63031" size="58"></u-icon>
-				<u-badge :count="7" :offset="[20, 30]"></u-badge>
 				<view class="grid-text">超时</view>
 			</u-grid-item>
 			<u-grid-item @click="nav_taskAll()">
 				<u-icon name="arrow-upward" color="#0984e3" size="58"></u-icon>
-				<u-badge :count="6" :offset="[20, 30]"></u-badge>
 				<view class="grid-text">所有工单</view>
 			</u-grid-item>
 			<u-grid-item @click="nav_hasComplete()">

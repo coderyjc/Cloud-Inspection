@@ -36,17 +36,18 @@ import {getTime} from '../../utils/timeutil.js'
 
 export default {
 	data() {
+		// 38.08331446451156, 114.50393199920654
 		return {
 			// 地图坐标相关
 			markers: [{
 				id:'1',
-				latitude: 37.99296,
-				longitude: 114.484118
+				latitude: 38.08331,
+				longitude: 114.50393
 			}],
 			poisdatas: [{}],
 			title: 'map',
-			latitude: 37.99296,
-			longitude: 114.484118,
+			latitude: 38.08331,
+			longitude: 114.50393,
 			// 损伤相关
 			damage_id: 0,
 			damage_info: {},
