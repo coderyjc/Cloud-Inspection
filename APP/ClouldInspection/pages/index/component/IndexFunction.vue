@@ -9,16 +9,7 @@
 			<view class="item-name">
 				上报
 			</view>
-		</view>
-		<!-- 巡检 -->
-		<view class="function-item" @click="nav_inspect()">
-			<view class="item-icon">
-				<u-icon name="search" color="#2979ff" size="58"></u-icon>
-			</view>
-			<view class="item-name">
-				巡检
-			</view>
-		</view>		
+		</view>	
 	</view>
 </template>
 
@@ -55,10 +46,10 @@
 		
 		// 巡检的数据情况
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
 		flex-wrap: wrap;
 		padding: 5px;
-
+		
 		.function-item {
 			display: block;
 			width: 180rpx;

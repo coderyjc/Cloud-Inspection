@@ -7,7 +7,7 @@
 				
 			</view>
 			<view class="title">
-				<text>任务完成情况:</text>
+				<text>任务完成情况 : </text>
 			</view>
 			<view class="u-demo-area">
 				<view class="pre-box" v-if="!showUploadList">
@@ -75,7 +75,8 @@
 			this.taskid = options.taskid
 		},
 		onShow() {
-			this.action = 'http://127.0.0.1:8086/task/put/' + this.taskid
+			// this.action = 'http://127.0.0.1:8086/task/put/' + this.taskid
+			this.action = 'http://101.201.64.102:8890/task/put/' + this.taskid
 		},
 		methods: {
 			bindTypePickerChange: function(e) {
@@ -112,12 +113,14 @@
 			submitTask(){
 				this.$u.api.submitTask(this.taskid).then(res => {
 					this.$refs.uToast.show({
-						title: '接单成功',
+						title: '提交成功',
 						type: 'success',
 					})
 					setTimeout(() => {
-						this.$u.route('/pages/task/today/ongoing')
-					}, 2000)
+						uni.navigateBack({
+							delta: 4
+						})
+					}, 1000)
 				})
 			}
 		}

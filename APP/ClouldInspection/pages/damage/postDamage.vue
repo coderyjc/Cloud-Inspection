@@ -67,8 +67,8 @@
 				markers: [{}, {}, {}],
 				poisdatas: [{}, {}, {}],
 				title: 'map',
-				latitude: 38.083314,
-				longitude: 114.503931,
+				latitude: 38.08362,
+				longitude: 114.51161,
 				// 用户信息
 				user: {},
 				// 上传图片的地址
@@ -85,7 +85,7 @@
 				damageTypeList: [
 					{
 						typeId: "1",
-						typeName: "未知"
+						typeName: "混合"
 					},
 					{
 						typeId: "2",
@@ -106,6 +106,7 @@
 			}
 		},
 		onShow() {
+			this.location = "114.503931,38.083314"
 			var that = this
 			uni.getLocation({
 				type: 'gcj02',
@@ -121,7 +122,7 @@
 				this.user = user
 			}
 			// this.action = 'http://127.0.0.1:8086/damage_image/put/' + user.userId
-			this.action = 'http://101.201.64.102:8890/damage_image/put/1'
+			this.action = 'http://101.201.64.102:8890/damage_image/put/' + user.userId
 		},
 		methods: {
 			getLocation() {
@@ -129,7 +130,9 @@
 				uni.getLocation({
 					type: 'gcj02',
 				 success: function(res) {
-						that.buttonText = "获取不到位置"
+						this.latitude = res.latitude
+						this.longitude = res.longitude
+						that.location = this.longitude+','+this.latitude
 					}
 				});
 			},
@@ -170,27 +173,24 @@
 			},
 			// 提交
 			formSubmit(){
-				this.latitude = 38.083314
-				this.longitude = 114.503931
-				let location = this.longitude+','+this.latitude
+				// this.latitude = 38.083314
+				// this.longitude = 114.503931
+				// let location = this.longitude+','+this.latitude
 				
-				if(location.length < 10){
-					this.$refs.uToast.show({
-						title: '位置获取失败',
-						type: 'error',
-					})
-					return
+				// if(location.length < 10){
+				// 	this.$refs.uToast.show({
+				// 		title: '位置获取失败',
+				// 		type: 'error',
+				// 	})
+				// 	return
+				// }
+				
+				if(this.description == ""){
+					this.description = "用户未填写损伤描述";
 				}
-				if(this.description.length < 10){
-					this.$refs.uToast.show({
-						title: '内容不得少于10字',
-						type: 'error',
-					})
-					return
-				}		
 				
 				this.$u.api.postDamage(
-					location, 
+					this.location, 
 					this.damageTypeList[this.typeIndex].typeId,
 					this.user.userId,
 					this.description
@@ -198,8 +198,14 @@
 					this.$refs.uToast.show({
 						title: '上报成功',
 						type: 'success',
-						url: '/pages/index/index'
+						url: '/pages/index/index',
+						duration: 1000
 					})
+					setTimeout(function(){
+						uni.switchTab({
+							url: '/pages/index/index'
+						})
+					}, 1000)
 				})
 			}
 		}

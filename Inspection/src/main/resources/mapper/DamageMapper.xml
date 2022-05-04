@@ -35,7 +35,7 @@
 
     <select id="listDamageToday" resultType="com.stdu.inspection.pojo.DamageDamageType">
         select <include refid="Damage_Damage_type_Column_List" />
-        from v_damage_damage_type where post_date like '%${time}%'
+        from v_damage_damage_type where post_date like '%${time}%' and status = 1
     </select>
 
     <select id="getDamageById" resultType="com.stdu.inspection.pojo.DamageDamageType">

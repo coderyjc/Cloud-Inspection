@@ -39,6 +39,10 @@
     <insert id="delayTask">
         insert into task_delay values (#{taskId}, #{time}, #{description});
     </insert>
+    <insert id="insertCompleteTask">
+        insert into task_complete values (#{taskId}, #{damageId}, #{receiver}, #{receiveDate},
+                                          #{deadline}, #{submitDate}, NOW(), null);
+    </insert>
 
     <select id="getTaskProcessById" resultType="com.stdu.inspection.pojo.TaskProcess">
         select <include refid="Task_Process_List" />
@@ -49,9 +53,19 @@
         select <include refid="Task_Process_List" />
         from v_task_process ${ew.customSqlSegment}
     </select>
+
     <select id="listTaskComplete" resultType="com.stdu.inspection.pojo.TaskComplete">
         select <include refid="Task_Complete_List" />
         from v_task_complete ${ew.customSqlSegment}
+    </select>
+
+    <select id="listTaskImage" resultType="java.lang.String">
+        select filename from task_complete_image where task_id = ${id}
+    </select>
+
+    <select id="listTaskAllByProcess" resultType="com.stdu.inspection.pojo.TaskProcess">
+        select <include refid="Task_Process_List" />
+        from v_task_process ${ew.customSqlSegment}
     </select>
 
 

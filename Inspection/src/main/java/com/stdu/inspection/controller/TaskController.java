@@ -1,11 +1,15 @@
 package com.stdu.inspection.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stdu.inspection.pojo.DamageImage;
 import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.TaskComplete;
 import com.stdu.inspection.pojo.TaskProcess;
+import com.stdu.inspection.service.DamageImageService;
 import com.stdu.inspection.service.DamageService;
 import com.stdu.inspection.service.TaskService;
 import com.stdu.inspection.utils.ConstUtil;
@@ -17,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -278,6 +283,67 @@ public class TaskController {
         boolean suc = taskService.delayTask(taskId, time, description);
         return Msg.success().add("suc", suc);
     }
+
+    /**
+     * 【获取所有用户需要审核的任务列表】
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/checking", method = RequestMethod.GET)
+    public Msg listTaskCheckingAll(
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ){
+        IPage<TaskProcess> ipage = taskService.listTaskCheckingAll(pn, limit);
+        return Msg.success().add("pageInfo", ipage);
+    }
+
+
+    /**
+     * 获取提交任务的图片
+     * @param damageId 损伤id
+     * @return
+     */
+    @RequestMapping(value = "/task_image", method = RequestMethod.GET)
+    public Msg listTaskImage(
+            @RequestParam("id") String id
+    ){
+        List<String> image = taskService.listTaskImage(id);
+        return Msg.success().add("images", image);
+    }
+
+    /**
+     * 查看所有已经完成的任务
+     * @param id 任务 id
+     * @return
+     */
+    @RequestMapping(value = "/complete", method = RequestMethod.POST)
+    public Msg completeTask(
+            @RequestParam("id") String id
+    ){
+        taskService.submitTask(id, "");
+        return Msg.success();
+    }
+
+    /**
+     * 列出所有正在进行的任务
+     * @param pn 页面
+     * @param limit 限制
+     * @return
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Msg listAllWithProcess(
+            @RequestParam(value = "pn", defaultValue = "1")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit
+    ){
+
+        IPage<TaskProcess> iPage = taskService.listTaskAllByProcess(Integer.parseInt(pn),
+                Integer.parseInt(limit));
+
+        return Msg.success().add("pageInfo", iPage);
+    }
+
 
 }
 

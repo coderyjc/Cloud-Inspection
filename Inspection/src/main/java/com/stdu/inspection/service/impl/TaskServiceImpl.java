@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.QualifierAnnotationAutowireC
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -62,7 +63,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             .setDeadline(new Date(now.getTime() + 86400000L));
 
         // 截止日期为1天
-
         task.insert();
     }
 
@@ -73,8 +73,13 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Override
     public boolean submitTask(String taskId, String description) {
-        // 提交任务，直接调用存储过程
-        return baseMapper.submitTask(taskId, description);
+        Task task = new Task();
+        task.setTaskId(Integer.parseInt(taskId));
+        task = task.selectById();
+        baseMapper.insertCompleteTask(taskId, task.getDamageId(), task.getReceiveDate(),
+                task.getReceiver(), task.getDeadline(), task.getSubmitDate());
+        task.deleteById();
+        return true;
     }
 
     @Override
@@ -136,10 +141,33 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
+    public IPage<TaskProcess> listTaskCheckingAll(String pn, String limit) {
+        IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
+        QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();
+        wrapper.eq("status", ConstUtil.TASK_COMMIT);
+        return baseMapper.listTaskByProcess(iPage, wrapper);
+    }
+
+    @Override
+    public List<String> listTaskImage(String id) {
+        return baseMapper.listTaskImage(id);
+    }
+
+    @Override
+    public IPage<TaskProcess> listTaskAllByProcess(int pn, int limit) {
+        IPage<TaskProcess> iPage = new Page<>(pn, limit);
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("receive_date");
+        // 按照接受任务的时间排序
+        return baseMapper.listTaskAllByProcess(iPage, wrapper);
+    }
+
+    @Override
     public IPage<TaskProcess> listTaskAcquiredByUser(String userId, String pn, String limit) {
         IPage<TaskProcess> iPage =  new Page<>(Integer.parseInt(pn),Integer.parseInt(limit));
         QueryWrapper<TaskProcess> wrapper = new QueryWrapper<>();
         wrapper.eq("receiver", Integer.parseInt(userId));
+        wrapper.eq("status", ConstUtil.TASK_ACCEPT);
         return baseMapper.listTaskByProcess(iPage, wrapper);
     }
 }

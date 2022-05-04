@@ -13,7 +13,7 @@
 				<view class="card-body" slot="body">
 					<view class="card-left">
 						<!-- 图片 -->
-						<image :src="picture" mode="aspectFill"></image>
+						<image :src="'http://101.201.64.102:8890/static/damage_picture/36a6351212054795948494bf5f5a48b7.jpg'" mode="aspectFill"></image>
 					</view>
 					<view class="card-right">
 						<!-- 备注 -->

@@ -68,4 +68,5 @@ public interface DamageService extends IService<Damage> {
      * @param status 要改变为的状态
      */
     void updateDamageStatus(int id, int status);
+
 }

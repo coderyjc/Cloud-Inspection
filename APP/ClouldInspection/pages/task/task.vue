@@ -20,6 +20,7 @@
 				:source="item.postSource"
 				:type="item.damageTypeId"
 				:description="item.description"
+				:picture="picture_list[index]"
 				@body-click="nav_details(item.id)"></TaskItem>
 			
 			<u-loadmore 
@@ -44,6 +45,8 @@
 				scrollTop: 0,
 				// 数据相关
 				taskList: [],
+				// 图像列表
+				picture_list: [],
 				pn: 1,
 				limit: 5,
 				// 刷新相关
@@ -54,7 +57,7 @@
 					loadmore: '轻轻上拉加载更多',
 					loading: '努力加载中',
 					nomore: '我是有底线的'
-				}
+				},
 			}
 		},
 		onPageScroll(e) {
@@ -69,6 +72,9 @@
 			// 网络请求等
 			this.get_data(this.pn, this.limit)
 		},
+		onShow(){
+			this.get_latest_data()
+		},
 		methods: {
 			nav_details(id) {
 				this.$u.route('/pages/damage/damageDetail', {
@@ -79,12 +85,31 @@
 				await this.$u.api.getDamageList(pn, limit).then(res => {
 					this.taskList = this.taskList.concat(res.list.records)
 				})
+				this.get_damage_picture()
 			}, 
 			async get_latest_data(){
 				await this.$u.api.getDamageList(1, 5).then(res => {
+					this.taskList = []
 					this.taskList = res.list.records
 				})
+				this.get_damage_picture()
 			}, 
+			async get_damage_picture(){
+				let that = this
+				this.picture_list = []
+				for(let i = 0; i < this.taskList.length; i++){
+				await this.$u.api.getDamagePicture(this.taskList[i].id).then(res => {
+						if(res.images.length >= 1){
+							let filename = this.$u.api.getPicture(res.images[0].filename)
+							if (filename != "" || filename != null || filename != undefined){
+								that.picture_list.push(filename)
+							} else {
+								that.picture_list.push(null)
+							}
+						}
+					})
+				}
+			},
 			onRefresh() {
 				if(this._freshing == true) return
 				if(this.triggered == false) this.triggered = true

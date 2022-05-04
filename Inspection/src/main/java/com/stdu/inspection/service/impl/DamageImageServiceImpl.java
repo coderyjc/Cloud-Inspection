@@ -28,8 +28,9 @@ public class DamageImageServiceImpl extends ServiceImpl<DamageImageMapper, Damag
         wrapper.eq("update_id", postId);
         DamageImage damageImage = new DamageImage();
         damageImage.setDamageId(damageId);
+        damageImage.setUpdateId(0);
         damageImage.update(wrapper);
-        return 1;
+        return 0;
     }
 
     @Override

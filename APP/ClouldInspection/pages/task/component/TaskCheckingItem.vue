@@ -5,14 +5,14 @@
 				<!-- 头部信息 -->
 				<view class="card-head" slot="head">
 					<view class="tag-group">
-						<u-tag :text="typeList[type-1]" mode="light" />
+						<u-tag :text="typeList[type - 1]" mode="light" />
 						<u-tag :text="sourceList[source]" mode="light" />
 					</view>
 				</view>
 				<!-- 中部任务简介 -->
 				<view class="card-body" slot="body">
+					
 					<view class="card-left">
-						<!-- 图片 -->
 						<image :src="picture" mode="aspectFill"></image>
 					</view>
 					<view class="card-right">
@@ -61,8 +61,8 @@ export default {
 	name: "TaskCheckingItem",
 	data() {
 		return {
-			typeList: ['未知', '掉块','裂纹', '擦伤'],
-			sourceList: ['未知', '人工巡检', '巡检车'],
+			typeList: ['混合', '掉块','裂纹', '擦伤'],
+			sourceList: ['人工巡检', '人工巡检', '巡检车'],
 		};
 	},
 	props:{

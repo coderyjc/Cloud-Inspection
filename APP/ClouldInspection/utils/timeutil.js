@@ -11,5 +11,5 @@ export function getTime(timestamp){
 	var hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
 	var mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
 	var ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-	return Y + M + D + hh + ':' + mm + ':' + ss
+	return Y + M + D + ' '  + hh + ':' + mm + ':' + ss
 }

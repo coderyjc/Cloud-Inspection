@@ -2,16 +2,16 @@
 	<view class="progress">
 		<view class="progress-wrap">
 			<view class="progress-info">
-				<u-steps :current="task.status-1" 
+				<u-steps :current="task.status - 1" 
 						:list="steps" 
 						mode="dot"></u-steps>
 				<!-- 损伤图片 -->
-				<view class="card-left">
+				<!-- <view class="card-left"> -->
 					<!-- 图片 -->
-					<image v-for="(item,index) in picture_list"
-					:src="item" 
-					mode="aspectFill"></image>
-				</view>
+					<!-- <image v-for="(item,index) in picture_list" -->
+					<!-- :src="item" -->
+					<!-- mode="aspectFill"></image> -->
+				<!-- </view> -->
 				<!-- 类型 -->
 				<view class="damage-type">
 					损伤类型：{{damageType[task.type-1]}}
@@ -47,13 +47,13 @@ export default {
 		return {
 			markers: [{
 				id:'1',
-				latitude: 38.02551808661723,
-				longitude: 114.48723424885557
+				latitude: 38.08362,
+				longitude: 114.51161,
 			}],
 			poisdatas: [{}],
 			title: 'map',
-			latitude: 38.02551808661723,
-			longitude: 114.48723424885557,
+			latitude: 38.08362,
+			longitude: 114.51161,
 			steps: [{
 				name: '任务发布'
 			}, {
@@ -64,7 +64,7 @@ export default {
 				name: '验收成功'
 			}, ],
 			task: {},
-			damageType: ['未知','掉块','裂纹','擦伤'],
+			damageType: ['混合','掉块','裂纹','擦伤'],
 			picture_list:[]
 		}
 	},
@@ -85,10 +85,13 @@ export default {
 				this.task = res.taskProcess
 				
 				this.$u.api.getDamagePicture(this.task.damageId).then(res => {
+					console.log(res);
 					res.images.forEach(res =>{
 						this.picture_list.push(this.$u.api.getPicture(res.filename))
+						console.log(this.picture_list);
 					})
 				})
+				
 			})
 		},
 		submitTask(){

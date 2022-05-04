@@ -66,7 +66,7 @@ export default {
 	data() {
 		return {
 			// 常量
-			typeList: ['未知', '掉块','裂纹', '擦伤'],
+			typeList: ['混合', '掉块','裂纹', '擦伤'],
 			sourceList: ['未知', '人工巡检', '巡检车'],
 			
 		};

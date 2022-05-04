@@ -21,11 +21,11 @@
 				<!-- 类型 -->
 				<view class="damage-type"> 损伤类型：擦伤 </view>
 				<!-- 描述 -->
-				<view class="damage-desc"> {{damage_info.description}} </view>
+				<view class="damage-desc"> 备注: {{damage_info.description}} </view>
 			</view>
 			<view class="btn-group">
 				<!-- 提交任务 -->
-				<button class="receive-button" @click="acquire_task">接单</button>
+				<button class="receive-button" @click="acquire_task">开始修复</button>
 			</view>
 		</view>
 	</view>
@@ -36,18 +36,18 @@ import {getTime} from '../../utils/timeutil.js'
 
 export default {
 	data() {
-		// 38.08331446451156, 114.50393199920654
+		// 114.511619,38.083625
 		return {
 			// 地图坐标相关
 			markers: [{
 				id:'1',
-				latitude: 38.08331,
-				longitude: 114.50393
+				latitude: 38.08362,
+				longitude: 114.51161,
 			}],
 			poisdatas: [{}],
 			title: 'map',
-			latitude: 38.08331,
-			longitude: 114.50393,
+			latitude: 38.08362,
+			longitude: 114.51161,
 			// 损伤相关
 			damage_id: 0,
 			damage_info: {},

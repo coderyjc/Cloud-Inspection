@@ -51,7 +51,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         vUserDayTask vUserDayTask = new vUserDayTask();
         vUserDayTask.setId(ID);
-//        vUserDayTask.setDate(TimeUtils.castDateStringToDateTypeYMD(date));
         vUserDayTask.setCountReceive(countReceive);
         vUserDayTask.setCountCheck(countCheck);
         vUserDayTask.setCountComplete(countComplete);

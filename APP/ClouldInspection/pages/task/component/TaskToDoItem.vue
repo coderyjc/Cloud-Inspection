@@ -54,8 +54,8 @@ export default {
 	name: "TaskToDoItem",
 	data() {
 		return {
-			typeList: ['未知', '掉块','裂纹', '擦伤'],
-			sourceList: ['未知', '人工巡检', '巡检车'],
+			typeList: ['混合', '掉块','裂纹', '擦伤'],
+			sourceList: ['人工巡检', '人工巡检', '巡检车'],
 		};
 	},
 	props:{

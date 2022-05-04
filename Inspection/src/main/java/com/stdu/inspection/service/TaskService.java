@@ -6,6 +6,8 @@ import com.stdu.inspection.pojo.Task;
 import com.stdu.inspection.pojo.TaskComplete;
 import com.stdu.inspection.pojo.TaskProcess;
 
+import java.util.List;
+
 /**
  * <p>
  * 服务类
@@ -126,4 +128,16 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     boolean delayTask(String taskId, String time, String description);
+
+    /**
+     * [获取所有需要审核的任务列表]
+     * @param pn 页码
+     * @param limit 页容量
+     * @return
+     */
+    IPage<TaskProcess> listTaskCheckingAll(String pn, String limit);
+
+    List<String> listTaskImage(String id);
+
+    IPage<TaskProcess> listTaskAllByProcess(int pn, int limit);
 }

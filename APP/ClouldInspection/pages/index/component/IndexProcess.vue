@@ -15,14 +15,6 @@
 			</u-grid-item>
 		</u-grid>
 		<u-grid :col="3">
-			<u-grid-item @click="nav_outOfTime()">
-				<u-icon name="clock" color="#d63031" size="58"></u-icon>
-				<view class="grid-text">超时</view>
-			</u-grid-item>
-			<u-grid-item @click="nav_taskAll()">
-				<u-icon name="arrow-upward" color="#0984e3" size="58"></u-icon>
-				<view class="grid-text">所有工单</view>
-			</u-grid-item>
 			<u-grid-item @click="nav_hasComplete()">
 				<u-icon name="checkmark" color="#00b894" size="58"></u-icon>
 				<view class="grid-text">今日完成</view>
@@ -58,7 +50,7 @@ export default {
 				this.$u.route('/pages/task/today/outOfTime');
 			},
 			nav_taskAll(){
-				this.$u.route('/pages/task/record');
+				this.$u.route('/pages/task/status/record');
 			},
 			nav_hasComplete(){
 				this.$u.route('/pages/task/today/complete');

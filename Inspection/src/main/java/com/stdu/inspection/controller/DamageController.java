@@ -1,7 +1,10 @@
 package com.stdu.inspection.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.stdu.inspection.pojo.Damage;
 import com.stdu.inspection.pojo.DamageDamageType;
 import com.stdu.inspection.service.DamageImageService;
 import com.stdu.inspection.service.DamageService;
@@ -128,6 +131,21 @@ public class DamageController {
 
         return Msg.success().add("suc", suc);
     }
+
+
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Msg listAll(
+            @RequestParam(value = "pn", defaultValue = "1")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit
+    ){
+        IPage<Damage> iPage = new Page<>(Integer.parseInt(pn), Integer.parseInt(limit));
+        QueryWrapper<Damage> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("post_date");
+        Damage damage = new Damage();
+        IPage<Damage> info = damage.selectPage(iPage, wrapper);
+        return Msg.success().add("pageInfo", info);
+    }
+
 
 }
 
