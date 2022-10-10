@@ -1,0 +1,6327 @@
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\config\AllowOriginIntercepter.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/16
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.config;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class AllowOriginIntercepter implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 过滤器
+//        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods","GET, POST, OPTIONS, PUT");
+        response.setHeader("Access-Control-Allow-Headers","Authorization, Content-Type, token");
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\config\MvcConfig.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/16
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.config;
+
+import com.jancoyan.jancoblog.utils.ConstantUtil;
+import org.springframework.boot.system.ApplicationHome;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.File;
+
+@Configuration
+public class MvcConfig implements WebMvcConfigurer {
+
+    /**
+     * 将jar文件下的对应静态资源文件路径对应到磁盘的路径(根据个人的情况修改"file:static/"的static的值)
+     *
+     * @param registry
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String path = "file:" + ConstantUtil.STATIC_RESOURCES;
+        registry.
+                addResourceHandler("/static/**").
+                addResourceLocations("classpath:/static/", path);
+    }
+
+    // 拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AllowOriginIntercepter());
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\config\MybatisPlusConfig.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/14
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.config;
+
+
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@EnableTransactionManagement
+@Configuration
+@MapperScan("com.jancoyan.jancoblog.mapper")
+public class MybatisPlusConfig {
+    // 分页拦截器对象，目前分页不支持表连接，只能单表查询
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\config\RedisConfig.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/25
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.config;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+public class RedisConfig {
+
+    @Bean
+    @SuppressWarnings("all")
+    public RedisTemplate<String, Object> redisTemplate(
+            RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template =
+                new RedisTemplate<String, Object>();
+        template.setConnectionFactory(factory);
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer =
+                new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+        StringRedisSerializer stringRedisSerializer =
+                new StringRedisSerializer();
+
+        // key采用String的序列化方式
+        template.setKeySerializer(stringRedisSerializer);
+        // hash的key也采用String的序列化方式
+        template.setHashKeySerializer(stringRedisSerializer);
+        // value序列化方式采用jackson
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        // hash的value序列化方式采用jackson
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.afterPropertiesSet();
+
+        return template;
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\ArticleController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.*;
+import com.jancoyan.jancoblog.service.ArticleService;
+import com.jancoyan.jancoblog.service.CommentService;
+import com.jancoyan.jancoblog.service.LikeRecordService;
+import com.jancoyan.jancoblog.utils.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@RestController
+@RequestMapping("/article")
+public class ArticleController {
+
+    @Autowired
+    ArticleService service;
+
+    @Autowired
+    CommentService  commentService;
+
+    @Autowired
+    LikeRecordService likeRecordService;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    /**
+     * 获取首页的文章，带有搜索功能
+     * @param pn 第几页
+     * @param limit 每一页的大小
+     * @param condition 条件
+     * @return 标准的pageInfo
+     */
+    @RequestMapping(value = "/all")
+    public Msg listArticleIndex(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition
+    ){
+        IPage<Article> iPage = service.listArticleIndex(Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 获取管理的文章管理列表的文章
+     * @param pn 第几页
+     * @param limit 容量
+     * @param condition 条件
+     * @return 成功
+     */
+    @RequestMapping(value = "/manage")
+    public Msg listArticleManageAll(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户登录信息过期了
+            return Msg.expire();
+        }
+        IPage<Article> iPage = service.listArticleManage(null,
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 获取当前登录的用户发表的所有文章
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @param request 获取token
+     * @return 成功
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public Msg listArticleManageUser(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request){
+        // 从token中拿到用户
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户信息已经过期了
+            return Msg.expire();
+        }
+        User user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.fail();
+        }
+        IPage<Article> iPage = service.listArticleManage(
+                user.getUserId(),
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 获取全站所有删除的文章
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @param request 获取token
+     * @return
+     */
+    @RequestMapping(value = "/deleted/all", method = RequestMethod.GET)
+    public Msg listDeletedAll(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户登录信息过期了
+            return Msg.expire();
+        }
+        IPage<Article> iPage = service.listDeleted(
+                null,
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 获取用户删除的文章
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @param request 获取token
+     * @return
+     */
+    @RequestMapping(value = "/deleted/user", method = RequestMethod.GET)
+    public Msg listDeletedUser(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request
+    ){
+        // 从token中拿到用户
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户信息已经过期了
+            return Msg.fail();
+        }
+        User user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.expire();
+        }
+        IPage<Article> iPage = service.listDeleted(
+                user.getUserId(),
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 彻底删除已经删除了的文章
+     * @param ids id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/deleted/delete", method = RequestMethod.POST)
+    public Msg deleteArticleDeleted(
+            String ids,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 未登录
+            return Msg.fail();
+        }
+        boolean suc = service.deleteCompletely(ids);
+        return Msg.success().add("suc", suc);
+    }
+
+    /**
+     * 批量恢复用户已经删除的文章
+     * @param ids id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/deleted/recover", method = RequestMethod.POST)
+    public Msg recoverArticle(
+            String ids,
+            HttpServletRequest request
+    ){
+        // 验证用户登录
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.fail();
+        }
+        // 恢复删除的文章
+        boolean suc = service.batchRecoverDeletedArticle(ids);
+        // 恢复删除的评论
+        commentService.recoverCommentByArticle(ids);
+        return Msg.success().add("suc", suc);
+    }
+
+    /**
+     * 批量删除文章
+     * @param ids 文章id，以 & 连接
+     * @return 成功/失败
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public Msg deleteArticle(
+            String ids,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }
+        // 批量删除文章
+        boolean suc = service.batchDeleteArticle(ids);
+        commentService.deleteCommentByArticle(ids);
+        return Msg.success().add("suc", suc);
+    }
+
+
+    /**
+     * 获取文章用于编辑
+     * @param id 文章id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/edit", method = RequestMethod.GET)
+    public Msg getArticleEdit(
+            @RequestParam(value = "id") String id,
+            HttpServletRequest request){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }
+        Article article = service.getArticleEdit(id);
+        return Msg.success().add("article", article);
+    }
+
+    /**
+     * 查看文章的时候获取单个文章
+     * @param articleId 文章ID
+     * @return 成功
+     */
+    @RequestMapping(value = "/single", method = RequestMethod.GET)
+    public Msg getArticleSingle(
+            @RequestParam(value = "id") String articleId
+    ){
+        Article article = service.getArticleSingle(articleId);
+        return Msg.success().add("article", article);
+    }
+
+    /**
+     * 查看被删除的文章的时候获取单个文章
+     * @param articleId 文章ID
+     * @return 成功
+     */
+    @RequestMapping(value = "/single/deleted", method = RequestMethod.GET)
+    public Msg getArticleSingleDeleted(
+            @RequestParam(value = "id") String articleId
+    ){
+        Article article = service.getArticleSingleDeleted(articleId);
+        return Msg.success().add("article", article);
+    }
+
+    /**
+     * 获取用户最近发布的文章 10 个
+     * @param id 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    @RequestMapping(value = "/recent", method = RequestMethod.GET)
+    public Msg listArticleUserRecently(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "pn", defaultValue = "1")Integer pn,
+            @RequestParam(value = "limit" ,defaultValue = "10")Integer limit
+    ){
+        IPage<PageArticle> iPage = service.listArticleUserRecently(id, pn, limit);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+
+    /**
+     * 点赞, 游客不能点赞
+     * @param id 点赞的文章
+     * @return 成功
+     */
+    @RequestMapping(value = "/like", method = RequestMethod.POST)
+    public Msg addLikeCount(
+            @RequestParam(value = "id")String id,
+            HttpServletRequest request
+    ){
+        //        登录认证
+        String token = request.getHeader("token");
+        if(null == token){
+            // 未登录，说明是游客
+            return Msg.loginNeeded();
+        }
+        User user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.expire();
+        }
+
+        service.addLikeCount(id);
+        likeRecordService.insertRecord(user.getUserId(), id);
+
+        return Msg.success();
+    }
+
+    /**
+     * 取消点赞
+     * @param id 点赞的文章
+     * @return 成功
+     */
+    @RequestMapping(value = "/dislike", method = RequestMethod.POST)
+    public Msg subLikeCount(
+            @RequestParam(value = "id")String id,
+            HttpServletRequest request
+    ){
+        //        登录认证
+        String token = request.getHeader("token");
+        if(null == token){
+            // 未登录，说明是游客
+            return Msg.loginNeeded();
+        }
+        User user = (User) redisUtil.get(token);
+
+        service.subLikeCount(id);
+        likeRecordService.deleteRecord(user.getUserId(), id);
+
+        return Msg.success();
+    }
+
+    /**
+     * 浏览
+     * @param id 点开的文章的id
+     * @return 成功
+     */
+    @RequestMapping(value = "/view", method = RequestMethod.GET)
+    public Msg addViewCount(@RequestParam(value = "id")String id){
+        service.addViewCount(id);
+        return Msg.success();
+    }
+
+    /**
+     * 改变当前评论的状态
+     * @param id 评论的id
+     * @return
+     */
+    @RequestMapping(value = "/toggle/comment", method = RequestMethod.POST)
+    public Msg updateIsComment(
+            @RequestParam(value = "id")String id,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }
+
+        boolean suc = service.updateIsComment(id);
+
+        if(suc) {
+            return Msg.success();
+        } else {
+            return Msg.fail();
+        }
+    }
+
+    /**
+     * 置顶指定的博文
+     * @param id 博文的id
+     * @return
+     */
+    @RequestMapping(value = "/toggle/top", method = RequestMethod.POST)
+    public Msg updateArticleTop(
+            @RequestParam(value = "id")String id,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }
+
+        boolean suc = service.updateIsTop(id);
+        if(suc) {
+            return Msg.success();
+        } else {
+            return Msg.fail();
+        }
+    }
+
+    /**
+     * 文章中图片上传
+     * @param file 图片
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/picture", method = RequestMethod.POST)
+    public Msg uploadPicture(
+            @RequestParam(value = "file") MultipartFile file,
+            HttpServletRequest request
+    ) throws IOException {
+        if (file == null) {
+            return Msg.fail().add("msg", "请选择要上传的图片");
+        }
+        if (file.getSize() > 1024 * 1024 * 10) {
+            return Msg.fail().add("msg", "文件大小不能大于10M");
+        }
+        //获取文件后缀
+        String suffix = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+        if (!"jpg,jpeg,gif,png".toUpperCase().contains(suffix.toUpperCase())) {
+            return Msg.fail().add("msg", "请选择jpg,jpeg,gif,png格式的图片");
+        }
+
+        // 获取当前年-月， 如 2021-01
+        String nowMonth = TimeUtils.getCurrentTimeString().substring(0, 7);
+        String savePath = ConstantUtil.STATIC_RESOURCES + "/p/" + nowMonth + "/";
+
+        File savePathFile = new File(savePath);
+        if (!savePathFile.exists()) {
+            //若不存在该目录，则创建目录
+            savePathFile.mkdir();
+        }
+
+        //通过UUID生成唯一文件名
+        String filename = UUID.randomUUID().toString().replaceAll("-","") + "." + suffix;
+
+        try {
+            //将文件保存指定目录
+            file.transferTo(new File(savePath + filename));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Msg.fail().add("msg", "保存文件异常");
+        }
+
+        String url =  ConstantUtil.STATIC_URL + "/p/" + nowMonth + "/" + filename;
+
+        //返回文件名称
+        return Msg.success().add("url", url);
+    }
+
+
+
+    /**
+     * 发表文章
+     * @param title 标题
+     * @param type 类型
+     * @param summary 摘要
+     * @param comment 是否允许评论
+     * @param md md格式的内容
+     * @param html 不加修饰的html格式的内容
+     * @param request request
+     * @return 消息
+     * @throws UnsupportedEncodingException 设置编码格式
+     */
+    @RequestMapping(value = "/post", method = RequestMethod.POST)
+    public Msg insertArticle(
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "summary") String summary,
+            @RequestParam(value = "comment") String comment,
+            @RequestParam(value = "md") String md,
+            @RequestParam(value = "html") String html,
+            HttpServletRequest request
+    ) throws UnsupportedEncodingException {
+        request.setCharacterEncoding("utf-8");
+        // 判断用户登录状态
+        String token = request.getHeader("token");
+        User user;
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }else{
+            user = (User) redisUtil.get(token);
+            if(null == user) {
+                return Msg.expire();
+            }
+        }
+        // 此时User已经拿到了。组装文章
+        Article article = new Article();
+        article.setArticleTitle(title)
+                .setArticleAuthor(user.getUserId())
+                .setArticleType(Integer.parseInt(type))
+                .setArticleHtml(ArticleUtils.simplifyImages(html))
+                .setArticleMd(ArticleUtils.replaceSingleSlash(md))
+                .setArticleIsComment("true".equals(comment) ? 1 : 0)
+                .setArticleRank(0);
+
+        // 统一发布时间
+        long now = System.currentTimeMillis();
+        article.setArticleId(ArticleUtils.getArticleId(user.getUserId(), now))
+                .setArticlePostTime(new Date(now))
+                .setArticleEditTime(new Date(now));
+
+        // 填充文章摘要
+        if(!"".equals(summary)){
+            article.setArticleSummary(summary);
+        }else{
+            article.setArticleSummary(ArticleUtils.getArticleDefaultSummary(html));
+        }
+
+        // 向文章——图片表中插入记录
+        List<String> images = ArticleUtils.getPicturesInArticle(html);
+        // 向 file-image 表中插入文章图片记录
+        ArticleImage articleImage = new ArticleImage();
+        for (String image : images) {
+            articleImage.setInsertDate(new Date(now));
+            articleImage.setArticleId(article.getArticleId());
+            articleImage.setFilename(image);
+            articleImage.insert();
+        }
+
+        boolean suc = article.insert();
+
+        return Msg.success().add("suc", suc).add("id", article.getArticleId());
+    }
+
+    /**
+     * 修改文章
+     * @param id 修改的文章的id
+     * @param title 标题
+     * @param type 类型
+     * @param summary 摘要
+     * @param comment 是否允许评论
+     * @param md md格式的内容
+     * @param html 不加修饰的html格式的内容
+     * @param request request
+     * @return 消息
+     * @throws UnsupportedEncodingException 设置编码格式
+     */
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public Msg updateArticle(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "summary") String summary,
+            @RequestParam(value = "comment") String comment,
+            @RequestParam(value = "md") String md,
+            @RequestParam(value = "html") String html,
+            HttpServletRequest request
+    ) throws UnsupportedEncodingException {
+        request.setCharacterEncoding("utf-8");
+        // 判断用户登录状态
+        String token = request.getHeader("token");
+        User user;
+        if(null == token){
+            // 用户未登录
+            return Msg.fail();
+        }else{
+            user = (User) redisUtil.get(token);
+            if(null == user) {
+                return Msg.expire();
+            }
+        }
+        // 此时User已经拿到了。组装文章
+        Article article = new Article();
+
+        article.setArticleId(id)
+                .setArticleTitle(title)
+                .setArticleAuthor(user.getUserId())
+                .setArticleType(Integer.parseInt(type))
+                .setArticleHtml(ArticleUtils.simplifyImages(html))
+                .setArticleMd(ArticleUtils.replaceSingleSlash(md))
+                .setArticleIsComment("true".equals(comment) ? 1 : 0)
+                .setArticleRank(0);
+
+        // 统一发布时间
+        long now = System.currentTimeMillis();
+        article.setArticleEditTime(new Date(now));
+
+        // 填充文章摘要
+        if(!"".equals(summary)){
+            article.setArticleSummary(summary);
+        }else{
+            article.setArticleSummary(ArticleUtils.getArticleDefaultSummary(html));
+        }
+
+        // 向文章——图片表中插入记录
+        List<String> images = ArticleUtils.getPicturesInArticle(html);
+        // 向 file-image 表中插入文章图片记录
+        ArticleImage articleImage = new ArticleImage();
+        for (String image : images) {
+            articleImage.setInsertDate(new Date(now));
+            articleImage.setArticleId(article.getArticleId());
+            articleImage.setFilename(image);
+            try {
+                articleImage.insert();
+            }catch (Exception e){
+                // 略过
+            }
+        }
+
+        boolean suc = article.updateById();
+
+        return Msg.success().add("suc", suc).add("id", article.getArticleId());
+    }
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\ArticleImageController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.stereotype.Controller;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-16
+ */
+@Controller
+@RequestMapping("/article_image")
+public class ArticleImageController {
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\CommentController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.jancoyan.jancoblog.pojo.PageComment;
+import com.jancoyan.jancoblog.pojo.User;
+import com.jancoyan.jancoblog.service.CommentService;
+import com.jancoyan.jancoblog.utils.Msg;
+import com.jancoyan.jancoblog.utils.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@RestController
+@RequestMapping("/comment")
+public class CommentController {
+
+    @Autowired
+    CommentService service;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+
+    /**
+     * 管理员进行评论管理的时候，获取所有评论
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return 成功
+     */
+    @RequestMapping(value = "/all")
+    public Msg listAll(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition
+    ){
+        IPage<Comment> iPage = service.listAll(null, Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+
+    /**
+     * 获取用户收到的所有评论
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @param request request
+     * @return 消息
+     */
+    @RequestMapping(value = "/receive")
+    public Msg listCommentByUserReceive(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request
+    ){
+        // 从token中拿到用户
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.expire();
+        }
+        User user = (User) redisUtil.get(token);
+        IPage<Comment> iPage = service.listAll(
+                String.valueOf(user.getUserId()),
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 获取当前登录的用户所发表的所有评论
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/posted")
+    public Msg listCommentByUserPosted(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition,
+            HttpServletRequest request
+    ){
+        // 从token中拿到用户
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.expire();
+        }
+        User user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.fail().add("msg", "获取失败");
+        }
+        IPage<Comment> iPage = service.listCommentByUserPosted(
+                String.valueOf(user.getUserId()),
+                Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 批量删除评论
+     * @param ids 评论id
+     * @return 消息
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public Msg deleteComment(
+            @RequestParam(value = "ids") String ids
+    ){
+        boolean suc = service.batchDeleteComment(ids);
+        return Msg.success().add("suc", suc ? "success" : "fail");
+    }
+
+    /**
+     * 获取某个文章的分页评论
+     * @param id 文章id
+     * @param pn 页码
+     * @param limit 容量，默认为 7
+     * @return 消息
+     */
+    @RequestMapping(value = "/article")
+    public Msg listCommentByArticle(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "pn")Integer pn,
+            @RequestParam(value = "limit", defaultValue = "7") Integer limit
+    ){
+        IPage<Comment> iPage = service.listCommentByArticle(id, pn, limit);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 发表评论
+     * @param articleId 目标文章
+     * @param userName 用户名，游客有效
+     * @param email 邮箱，游客有效
+     * @param content 内容
+     * @param request request，用来获取ip
+     * @return 消息
+     */
+    @RequestMapping(value = "/post", method = RequestMethod.POST)
+    public Msg insertComment(
+            @RequestParam(value = "articleId")String articleId,
+            @RequestParam(value = "name", defaultValue = "") String userName,
+            @RequestParam(value = "email", defaultValue = "")String email,
+            @RequestParam(value = "content")String content,
+            HttpServletRequest request
+    ){
+//      先判断是不是已经登陆了
+        Comment comment = new Comment();
+        String token = request.getHeader("token");
+        User user = (User) redisUtil.get(token);
+        // 用户信息已经过期了
+        if(null == user && null != token) {
+            return Msg.expire();
+        }
+
+        // 如果 token 是 null
+        if(null == token || "".equals(token)){
+            // 游客发表的评论
+            comment.setCommentAuthorEmail(email);
+            comment.setCommentAuthorName(userName);
+        } else {
+            // 已经登录的用户发表的评论
+            comment.setCommentAuthorName(user.getUserName());
+            comment.setCommentAuthorId(user.getUserId());
+        }
+        comment.setCommentArticleId(articleId);
+        comment.setCommentDate(new Date());
+        comment.setCommentContent(content);
+        comment.setCommentAuthorIp(request.getScheme());
+
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article = article.selectById();
+        article.setArticleCommentCount(article.getArticleCommentCount() + 1);
+        article.updateById();
+
+        comment.insert();
+        return Msg.success();
+    }
+
+    /**
+     * 给评论点赞
+     * @param id 评论id
+     * @return 消息
+     */
+    @RequestMapping(value = "/like", method = RequestMethod.POST)
+    public Msg likeComment(
+            @RequestParam(value = "id") Integer id
+    ){
+        service.likeComment(id);
+        return Msg.success();
+    }
+
+    /**
+     * 获取指定用户最近收到的评论
+     * @param authorId 用户id
+     * @return
+     */
+    @RequestMapping(value = "/recent", method = RequestMethod.GET)
+    public Msg listCommentByUserRecentlyReceive(
+            @RequestParam(value = "id") String authorId,
+            @RequestParam(value = "pn", defaultValue = "1") String pn,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ){
+        IPage<PageComment> iPage  = service.listCommentByUserRecently(authorId);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\DeletedCommentController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.jancoyan.jancoblog.service.DeletedCommentService;
+import com.jancoyan.jancoblog.utils.Msg;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-17
+ */
+@RestController
+@RequestMapping("/deleted/comment")
+public class DeletedCommentController {
+
+    @Autowired
+    DeletedCommentService service;
+
+    /**
+     * 获取某个文章的分页评论
+     * @param id 文章id
+     * @param pn 页码
+     * @param limit 容量，默认为 7
+     * @return 消息
+     */
+    @RequestMapping(value = "/article", method = RequestMethod.GET)
+    public Msg getCommentByArticle(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "pn", defaultValue = "1")Integer pn,
+            @RequestParam(value = "limit", defaultValue = "7") Integer limit
+    ){
+        IPage<DeletedComment> iPage = service.getCommentByArticle(id, pn, limit);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\LikeRecordController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.jancoyan.jancoblog.pojo.LikeRecord;
+import com.jancoyan.jancoblog.pojo.User;
+import com.jancoyan.jancoblog.service.LikeRecordService;
+import com.jancoyan.jancoblog.utils.Msg;
+import com.jancoyan.jancoblog.utils.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-06
+ */
+@RestController
+@RequestMapping("/like")
+public class LikeRecordController {
+
+    @Autowired
+    LikeRecordService service;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    /**
+     * 判断用户是否点赞了这个文章，只有用户登录了之后才会到这个请求中来
+     * @param id 文章id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/like", method = RequestMethod.GET)
+    public Msg isLiked(
+        @RequestParam(value = "id") String id,
+        HttpServletRequest request
+    ){
+//        登录认证
+        String token = request.getHeader("token");
+        if(null == token){
+            // 未登录，说明是游客
+            return Msg.success().add("suc", true);
+        }
+        User user;
+        user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.fail();
+        }
+
+        QueryWrapper<LikeRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("article_id", id);
+        wrapper.eq("author_id", user.getUserId());
+
+        LikeRecord record = new LikeRecord();
+        record = record.selectOne(wrapper);
+
+        if(null == record){
+//            没有点赞
+            return Msg.success().add("suc", false);
+        }else {
+//            点赞了
+            return Msg.success().add("suc", true);
+        }
+    }
+
+    /**
+     * 获取一个用户最近收到的分页点赞记录
+     * @param id 用户id
+     * @return
+     */
+    @RequestMapping(value = "/recent", method = RequestMethod.GET)
+    public Msg getUserLike(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "pn")Integer pn,
+            @RequestParam(value = "limit")Integer limit
+    ) {
+        //        登录认证
+        IPage<LikeRecord> pageInfo = service.getUserReceive(id, pn, limit);
+        return Msg.success().add("pageInfo", pageInfo);
+    }
+}R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\TypeController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.Type;
+import com.jancoyan.jancoblog.service.ArticleService;
+import com.jancoyan.jancoblog.service.TypeService;
+import com.jancoyan.jancoblog.utils.Msg;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.awt.geom.IllegalPathStateException;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@RestController
+@RequestMapping("/type")
+public class TypeController {
+
+
+    @Autowired
+    TypeService service;
+
+    /**
+     * 获取所有类别，不分页
+     * @return pageInfo
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Msg getAll(){
+        IPage<Type> iPage = new Page<>(1, 99);
+        Type type = new Type();
+        iPage = type.selectPage(iPage, null);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Msg addType(
+            @RequestParam(value = "name") String typeName,
+            @RequestParam(value = "description", defaultValue = "") String description
+    ){
+
+
+
+        return Msg.success();
+    }
+
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public Msg deleteType(
+            @RequestParam(value = "ids")String ids
+    ){
+
+
+
+        return Msg.success();
+    }
+
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public Msg updateType(
+            @RequestParam(value = "name") String typeName,
+            @RequestParam(value = "description", defaultValue = "") String description
+    ){
+
+
+        return Msg.success();
+    }
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\UserController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.User;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+import com.jancoyan.jancoblog.pojo.UserLogin;
+import com.jancoyan.jancoblog.pojo.VUserTotalData;
+import com.jancoyan.jancoblog.service.UserService;
+import com.jancoyan.jancoblog.utils.*;
+import io.lettuce.core.output.ScanOutput;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    UserService service;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    /**
+     * 登录
+     * @param username 用户名
+     * @param password 密码
+     * @return
+     */
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public Msg login(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            HttpServletRequest request
+    ){
+        String token = null;
+
+        // 从视图选择登录
+        User user = service.login(username, password);
+
+        if(null != user){
+            // 登录成功, 生成token
+            token = JsonWebTokenUtils.createToken(user.getUserId().longValue());
+            // 存到redis数据库, 设置过期时间为 60 分钟
+            redisUtil.set(token, user, 120 * 60);
+            // 更新上次登录时间
+            user.setUserLastLoginDate(new Date());
+            user.updateById();
+        } else {
+            return Msg.fail().add("msg", "登录失败");
+        }
+
+        //登录记录
+        UserLogin log = new UserLogin();
+        String userAgent = request.getHeader("User-Agent");
+        log.setLoginUser(user.getUserId());
+        log.setLoginDate(new Date());
+        log.setLoginAddress(NetworkUtils.queryAddressByIp(request.getRemoteAddr()));
+        log.setLoginIp(request.getRemoteAddr());
+        log.setUserAgent(userAgent);
+        log.setBrowserName(UserAgentUtils.getBorderName(userAgent));
+        log.setBrowserVersion(UserAgentUtils.getBrowserVersion(userAgent));
+        log.setOsName(UserAgentUtils.getOsName(userAgent));
+        log.setOsVersion(UserAgentUtils.getOsVersion(userAgent));
+
+        if(null != token){
+            //插入用户登录信息
+            log.insert();
+            return Msg.success().add("token", token);
+        }
+        return Msg.fail();
+    }
+
+
+    /**
+     * 用户主页的内容
+     * @param userId 用户id
+     * @param request request
+     * @return
+     */
+    @RequestMapping(value = "/data/total", method = RequestMethod.GET)
+    public Msg getUserTotalData(
+            @RequestParam(value = "id", defaultValue = "-1")String userId,
+            HttpServletRequest request
+    ){
+        if("-1".equals(userId)){
+            // 没有提供id, 直接获取当前登录的用户
+            String token = request.getHeader("token");
+            if(null == token) {
+                return Msg.fail();
+            }
+            User user = (User)redisUtil.get(token);
+            userId = String.valueOf(user.getUserId());
+        }
+        // 获取数据
+        VUserTotalData data = service.getUserTotalData(userId);
+
+        if (null != data){
+            return Msg.success().add("data", data);
+        } else {
+            return Msg.fail().add("msg", "找不到用户");
+        }
+    }
+
+
+    /**
+     * 每一次要获取信息的时候都会发送一次这个
+     * @return 带有用户消息的信息
+     */
+    @RequestMapping(value = "/userinfo", method = RequestMethod.GET)
+    public Msg getUserInfo(HttpServletRequest request){
+        // 把token放在请求头中
+        String token = request.getHeader("token");
+        User user = (User)redisUtil.get(token);
+        if(null != user){
+            // 获取用户成功
+            return Msg.success().add("user", user);
+        }
+        return Msg.fail().add("msg", "找不到用户");
+    }
+
+    /**
+     * 获取当前已经登录的用户的详细信息
+     * @param request req
+     * @return
+     */
+    @RequestMapping(value = "/userdetail", method = RequestMethod.GET)
+    public Msg getUserDetailInfo(
+            HttpServletRequest request
+    ){
+        // 把token放在请求头中
+        String token = request.getHeader("token");
+        User user = (User)redisUtil.get(token);
+        if(null == user){
+            // 获取用户失败
+            return Msg.expire().add("msg", "用户已过期");
+        }
+        // 获取用户的信息
+        UserInfo info = service.getUserInfo(user.getUserId());
+        if(null != info){
+            return Msg.success().add("info", info);
+        } else {
+            return Msg.fail();
+        }
+    }
+
+
+
+    /**
+     * 在进入文章的时候，简要显示用户展示给别人看的信息
+     * @param userId 用户id
+     * @return 消息
+     */
+    @RequestMapping(value = "/authorinfo", method = RequestMethod.GET)
+    public Msg getAuthorInfo(
+            @RequestParam(value = "id")String userId
+    ){
+        VUserTotalData data = service.getUserTotalData(userId);
+        if(null != data) {
+            return Msg.success().add("data", data);
+        } else {
+            return Msg.fail().add("msg", "获取数据失败");
+        }
+    }
+
+
+    /**
+     * 注册
+     * @param userName 姓名
+     * @param password 密码
+     * @param request 用来获取ip
+     * @return 消息
+     */
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public Msg register(
+            @RequestParam(value = "username") String userName,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "code") String code,
+            HttpServletRequest request
+    ) throws IOException {
+        String verify = (String) request.getSession().getAttribute(VerifyCodeUtil.RANDOMCODEKEY);
+
+        if(!verify.toLowerCase(Locale.ROOT).equals(code.toLowerCase(Locale.ROOT))){
+            return Msg.fail().add("msg", "验证码输入错误");
+        }
+
+        User user = new User();
+        // 设置信息
+        user.setUserName(userName)
+                .setUserLastLoginDate(null)
+                .setUserId(null)
+                .setUserSignature("Hello World")
+                .setUserPassword(MD5Util.getMD5(password))
+                .setUserRole(2)
+                .setUserCreateDate(new Date())
+                .setUserIp(request.getRemoteAddr());
+        // 生成头像
+        AvatarUtil.generateImg(userName,
+                ConstantUtil.STATIC_RESOURCES + "/avatar/",
+                userName);
+        // 插入
+        boolean insert = user.insert();
+        if(!insert){
+            return Msg.fail().add("msg", "用户注册失败");
+        }
+        return Msg.success().add("success", insert);
+    }
+
+    /**
+     * 用户注册的时候用来检查用户名的唯一性
+     * @param userName 用户名
+     * @return 消息
+     */
+    @RequestMapping(value = "/checkusername", method = RequestMethod.POST)
+    public Msg checkUserNameUnique(
+            @RequestParam(value = "username") String userName
+    ){
+        User user = new User();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", userName);
+        int count = user.selectCount(queryWrapper);
+        return Msg.success().add("unique", count == 0);
+    }
+
+    /**
+     * 用户退出登录
+     * @return 成功
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public Msg logout(HttpServletRequest request){
+        String token = request.getHeader("token");
+        if(null == token || "".equals(token)){
+            // 登录过期
+            return Msg.fail();
+        }
+        // 登录没过期，移除token
+        redisUtil.del(token);
+        return Msg.success().add("suc", true);
+    }
+
+    /**
+     * 管理员进行用户管理的时候分页获取所有用户
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Msg getAllUser(
+            @RequestParam(value = "pn")String pn,
+            @RequestParam(value = "limit", defaultValue = "10")String limit,
+            @RequestParam(value = "condition", defaultValue = "")String condition
+    ){
+        IPage<User> iPage = service.getAll(Integer.parseInt(pn),
+                Integer.parseInt(limit),
+                condition);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+    /**
+     * 批量删除用户
+     * @param ids 用户id 用 & 拼接
+     * @return
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public Msg batchDelte(
+            @RequestParam(value = "ids") String ids
+    ){
+        User user = new User();
+        boolean suc = false;
+        if(!ids.contains("&")){
+            user.setUserId(Integer.parseInt(ids));
+            suc = user.deleteById();
+        } else {
+            String[] id = ids.split("&");
+            for (String item : id) {
+                user.setUserId(Integer.parseInt(item));
+                suc = user.deleteById();
+            }
+        }
+        return Msg.success().add("suc", suc ? "success" : "fail");
+    }
+
+    /**
+     * 更换头像
+     * @return
+     */
+    @RequestMapping(value = "/upload/avatar", method = RequestMethod.POST)
+    public Msg uploadAvatar(
+            @RequestParam(value = "file") MultipartFile file,
+            HttpServletRequest request
+    ){
+        // 登录状态
+        String token = request.getHeader("token");
+        if (null == token){
+            return Msg.fail();
+        }
+        // 获取用户
+        User user = (User) redisUtil.get(token);
+        if (null == user){
+            return Msg.expire();
+        }
+        // 文件判定
+        if (null == file) {
+            return Msg.fail().add("msg", "请选择要上传的图片");
+        }
+        if (file.getSize() > 1024 * 1024 * 10) {
+            return Msg.fail().add("msg", "文件大小不能大于10M");
+        }
+        //获取文件后缀
+        String suffix = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+        if (!"jpg,jpeg,gif,png".toUpperCase().contains(suffix.toUpperCase())) {
+            return Msg.fail().add("msg", "请选择jpg,jpeg,gif,png格式的图片");
+        }
+        String savePath = null;
+        //            savePath = new File(".").getCanonicalPath() + "\\target\\classes\\static\\avatar\\";
+        savePath = ConstantUtil.STATIC_RESOURCES + "/avatar/";
+
+        File savePathFile = new File(savePath);
+        if (!savePathFile.exists()) {
+            //若不存在该目录，则创建目录
+            savePathFile.mkdir();
+        }
+
+        //用户头像名称就是用户的id
+        String filename = user.getUserName() + "." + suffix;
+        // 如果头衔已存在就先删除
+        File oldFile = new File(savePath + filename);
+        if(oldFile.exists()){
+            oldFile.delete();
+        }
+
+        try {
+            //将文件保存指定目录
+            file.transferTo(new File(savePath + filename));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Msg.fail().add("msg", "保存文件异常");
+        }
+
+        //返回文件名称
+        return Msg.success().add("suc", true);
+    }
+
+
+    /**
+     * 修改密码
+     * @param userId 用户id，如果没有就是修改自己的密码
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/changepwd", method = RequestMethod.POST)
+    public Msg changePassword(
+            @RequestParam(value = "id", defaultValue = "-1") String userId,
+            @RequestParam(value = "old") String oldPassword,
+            @RequestParam(value = "new") String newPassword,
+            HttpServletRequest request
+    ){
+        boolean suc = false;
+        // 先判断有没有id
+        if("-1".equals(userId)){
+            // 没有id，修改目前登录的用户的id
+            String token = request.getHeader("token");
+            if(null == token) {
+                return Msg.fail();
+            }
+            User user = (User) redisUtil.get(token);
+            if(user.getUserPassword().equals(MD5Util.getMD5(oldPassword))){
+                // 密码正确
+                user.setUserPassword(MD5Util.getMD5(newPassword));
+                suc = user.updateById();
+                return Msg.success().add("suc", suc);
+            } else {
+                return Msg.success().add("suc", suc);
+            }
+        } //修改当前登录的用户的密码
+        // 管理员修改用户的密码
+        User user = new User();
+        user.setUserId(Integer.parseInt(userId));
+        user.setUserPassword(MD5Util.getMD5(newPassword));
+        // 不需要验证旧密码
+        suc = user.updateById();
+        // 直接修改
+        return Msg.success().add("suc", suc);
+    }
+
+
+    /**
+     * 修改用户信息
+     * @param userInfo 用户信息
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/info/update", method = RequestMethod.POST)
+    public Msg updateUserInfo(
+            @RequestParam(value = "user")String userInfo,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.fail().add("msg", "用户未登录");
+        }
+        User user = new User();
+        user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.expire();
+        }
+
+        UserInfo info = new UserInfo();
+
+        // 收到一个userInfo - Json字符串，直接从这里拆开，然后update
+        userInfo = userInfo.substring(1, userInfo.length() - 1);
+
+        // 取出 “userId”：00000 这种
+        String[] kvs = userInfo.split(",");
+
+        for (String kv: kvs) {
+            String[] nameAndValue = kv.split(":");
+            // 下标0 为 “userID”  下标1为 “asdasd” “1” 10929 null
+            // userId
+            String name = nameAndValue[0].substring(1, nameAndValue[0].length() - 1);
+            String value = nameAndValue[1];
+            // 查找与选择逐个排查
+            if((!"null".equals(value)) && (!"".equals(value))){
+                // 此字段不是null
+                // 逐个判断 userInfo 中的属性
+                if("userId".equals(name)){
+                    info.setUserId(Integer.parseInt(value));
+                    continue;
+                }
+                if("userEmail".equals(name)){
+                    info.setUserEmail(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userSex".equals(name)){
+                    if("\"1\"".equals(value)){
+                        // 男
+                        info.setUserSex(1);
+                    } else if("\"0\"".equals(value)){
+                        // 女
+                        info.setUserSex(0);
+                    }
+                    continue;
+                }
+                if("userRegion".equals(name)){
+                    info.setUserRegion(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userBirthdate".equals(name)){
+                    info.setUserBirthdate(TimeUtils.castDateStringToDateTypeYMD(
+                            value.substring(1, 11)));
+                    continue;
+                }
+                if("userTelephone".equals(name)){
+                    info.setUserTelephone(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userRealName".equals(name)){
+                    info.setUserRealName(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userSchool".equals(name)){
+                    info.setUserSchool(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userMajor".equals(name)){
+                    info.setUserMajor(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userEnterSchoolDate".equals(name)) {
+                    info.setUserEnterSchoolDate(TimeUtils.castDateStringToDateTypeYMD(
+                            value.substring(1, 11)));
+                    continue;
+                }
+                if("userAcademicDegree".equals(name)){
+                    info.setUserAcademicDegree(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userCompany".equals(name)){
+                    info.setUserCompany(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userPosition".equals(name)){
+                    info.setUserPosition(value.substring(1, value.length() - 1));
+                    continue;
+                }
+                if("userField".equals(name)){
+                    info.setUserField(value.substring(1, value.length() - 1));
+                }
+            }
+
+        }
+
+        boolean suc = info.updateById();
+        return Msg.success().add("suc", suc);
+    }
+
+    @RequestMapping(value = "/info/user", method = RequestMethod.POST)
+    public Msg updateUser(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "signature") String signature,
+            HttpServletRequest request
+    ){
+        // 判断用户登录状态
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.fail().add("msg", "用户未登录");
+        }
+        User user = new User();
+        user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.expire();
+        }
+        // 修改用户
+        user.setUserSignature(signature);
+        user.setUserName(username);
+        boolean suc = user.updateById();
+        if(suc){
+            redisUtil.set(token, user, 20 * 60);
+        }
+        return Msg.success().add("suc", suc);
+    }
+
+
+    /**
+     * 获取验证码
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/getverifycode", method = RequestMethod.GET)
+    public void generateValidationCode(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session
+    ){
+        try {
+            //设置相应类型,告诉浏览器输出的内容为图片
+            response.setContentType("image/jpeg");
+
+            //设置响应头信息，告诉浏览器不要缓存此内容
+            response.setHeader("Pragma", "No-cache");
+
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expire", 0);
+            VerifyCodeUtil verifyCodeUtil = new VerifyCodeUtil();
+            //输出验证码图片方法
+            verifyCodeUtil.getRandcode(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Msg addUser(
+            @RequestParam("username") String userName,
+            @RequestParam("password") String password,
+            HttpServletRequest request
+    ) throws IOException {
+
+        User user = new User();
+        // 设置信息
+        user.setUserName(userName)
+                .setUserLastLoginDate(null)
+                .setUserId(null)
+                .setUserSignature("Hello World")
+                .setUserPassword(MD5Util.getMD5(password))
+                .setUserRole(2)
+                .setUserCreateDate(new Date())
+                .setUserIp(request.getRemoteAddr());
+
+        // 生成头像
+        AvatarUtil.generateImg(userName,
+                ConstantUtil.STATIC_RESOURCES + "/avatar",
+                userName);
+        // 插入
+        boolean insert = user.insert();
+        if(!insert){
+            return Msg.fail().add("msg", "用户注册失败");
+        }
+        return Msg.success().add("success", insert);
+    }
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\controller\UserLoginController.java
+
+
+package com.jancoyan.jancoblog.controller;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.User;
+import com.jancoyan.jancoblog.pojo.UserLogin;
+import com.jancoyan.jancoblog.service.UserLoginService;
+import com.jancoyan.jancoblog.utils.Msg;
+import com.jancoyan.jancoblog.utils.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-15
+ */
+@RestController
+@RequestMapping("/login")
+public class UserLoginController {
+
+    @Autowired
+    UserLoginService service;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    /**
+     * 查询特定用户的登录记录，未指定id就是查找当前用户的登录记录
+     * 只能查找最近10次的
+     * @param userId 用户id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Msg getAll(
+            @RequestParam(value = "id", defaultValue = "") String userId,
+            HttpServletRequest request
+    ){
+        String token = request.getHeader("token");
+        if(null == token){
+            return Msg.fail().add("msg", "用户验证失败");
+        }
+        User user = (User) redisUtil.get(token);
+        if(null == user){
+            return Msg.expire();
+        }
+
+        // 获取10条用户登录信息
+        UserLogin userLogin = new UserLogin();
+        // 构造Wrapper
+        QueryWrapper<UserLogin> wrapper = new QueryWrapper<>();
+        wrapper.eq("login_user", user.getUserId());
+        wrapper.orderByDesc("login_date");
+        // 构造Page
+        IPage<UserLogin> iPage = new Page<>(1, 10);
+        // 查询
+        iPage =  userLogin.selectPage(iPage, wrapper);
+        return Msg.success().add("pageInfo", iPage);
+    }
+
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\JancoBlogApplication.java
+
+
+package com.jancoyan.jancoblog;
+
+import org.apache.catalina.connector.Connector;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+@MapperScan("com.jancoyan.jancoblog.mapper")
+public class JancoBlogApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(JancoBlogApplication.class, args);
+    }
+
+
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
+            @Override
+            public void customize(Connector connector) {
+                connector.setProperty("relaxedQueryChars", "|{}[]");
+            }
+        });
+        return factory;
+    }
+
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\ArticleImageMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.jancoyan.jancoblog.pojo.ArticleImage;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-16
+ */
+public interface ArticleImageMapper extends BaseMapper<ArticleImage> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\ArticleMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jancoyan.jancoblog.pojo.PageArticle;
+
+import javax.swing.event.InternalFrameAdapter;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface ArticleMapper extends BaseMapper<Article> {
+
+    IPage<Article> getIndexList(IPage<Article> iPage, Wrapper ew);
+
+    IPage<Article> getManageList(IPage<Article> iPage, Wrapper ew);
+
+    Article getSingleArticle(String id);
+
+    IPage<Article> getDeletedList(IPage<Article> iPage, Wrapper ew);
+
+    void deleteCompletely(String articleId);
+
+    void batchRecover(String articleId);
+
+    IPage<PageArticle> getArticleByUserRecently(IPage<PageArticle> iPage, Wrapper ew);
+
+    Article getSingleArticleDeleted(String id);
+
+    Article getArticleEdit(String id);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\CommentMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jancoyan.jancoblog.pojo.PageComment;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface CommentMapper extends BaseMapper<Comment> {
+
+    IPage<Comment> getAll(IPage<Comment> iPage, Wrapper ew);
+
+    IPage<Comment> getCommentByArticle(IPage<Comment> page, QueryWrapper<Comment> ew);
+
+    IPage<Comment> getCommentByUserPosted(IPage<Comment> iPage, Wrapper ew);
+
+    IPage<PageComment> getCommentByUserRecently(IPage<PageComment> iPage, Wrapper ew);
+
+    void deleteComment(Integer commentId);
+
+    void recoverComment(Integer commentId);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\DeletedCommentMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-17
+ */
+public interface DeletedCommentMapper extends BaseMapper<DeletedComment> {
+
+    IPage<DeletedComment> getCommentByArticle(IPage<DeletedComment> iPage, Wrapper ew);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\LikeRecordMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.LikeRecord;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-06
+ */
+public interface LikeRecordMapper extends BaseMapper<LikeRecord> {
+
+    IPage<LikeRecord> getUserReceive(IPage<LikeRecord> iPage,
+                                     Wrapper<LikeRecord> ew, String userId);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\TypeMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.jancoyan.jancoblog.pojo.Type;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface TypeMapper extends BaseMapper<Type> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\UserInfoMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-14
+ */
+public interface UserInfoMapper extends BaseMapper<UserInfo> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\UserLoginMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.jancoyan.jancoblog.pojo.UserLogin;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-15
+ */
+public interface UserLoginMapper extends BaseMapper<UserLogin> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\mapper\UserMapper.java
+
+
+package com.jancoyan.jancoblog.mapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.User;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+import com.jancoyan.jancoblog.pojo.VUserTotalData;
+
+import java.util.List;
+
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface UserMapper extends BaseMapper<User> {
+
+    IPage<User> getAll(IPage<User> iPage, Wrapper ew);
+
+    VUserTotalData getUserTotalData(String userId);
+
+    UserInfo getUserInfo(Integer userId);
+
+    User login(String username, String password);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\Article.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_article")
+public class Article extends Model<Article> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "article_id")
+    private String articleId;
+
+    private String articleTitle;
+
+    private Integer articleAuthor;
+
+    private Integer articleType;
+
+    private String articleSummary;
+
+    private String articleHtml;
+
+    private String articleMd;
+
+    private Integer articleIsComment;
+
+    private Integer articleRank;
+
+    private Date articlePostTime;
+
+    private Date articleEditTime;
+
+    private Integer articleViewCount;
+
+    private Integer articleCommentCount;
+
+    private Integer articleLikeCount;
+
+    @TableField(exist = false)
+    private String userName;
+
+    @TableField(exist = false)
+    private String typeName;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\ArticleImage.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-16
+ */
+@EqualsAndHashCode(callSuper = true)
+@TableName("tbl_article_image")
+@Data
+public class ArticleImage extends Model<ArticleImage> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "filename")
+    private String filename;
+
+    private String articleId;
+
+    private Date insertDate;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\Comment.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_comment")
+public class Comment extends Model<Comment> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "comment_id", type = IdType.AUTO)
+    private Integer commentId;
+
+    private Integer preCommentId;
+
+    private String commentArticleId;
+
+    private Integer commentAuthorId;
+
+    private String commentAuthorName;
+
+    private String commentAuthorEmail;
+
+    private String commentContent;
+
+    private Date commentDate;
+
+    private String commentAuthorIp;
+
+    private Integer commentLikeCount;
+
+    @TableField(exist = false)
+    private String articleTitle;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\DeletedComment.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-17
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_deleted_comment")
+public class DeletedComment extends Model<DeletedComment> {
+
+    private static final long serialVersionUID = 1L;
+
+    private Integer commentId;
+
+    private Integer preCommentId;
+
+    private String commentArticleId;
+
+    private Integer commentAuthorId;
+
+    private String commentAuthorName;
+
+    private String commentAuthorEmail;
+
+    private String commentContent;
+
+    private Date commentDate;
+
+    private String commentAuthorIp;
+
+    private Integer commentLikeCount;
+
+    @TableField(exist = false)
+    private String articleTitle;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\LikeRecord.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-06
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_like_record")
+public class LikeRecord extends Model<LikeRecord> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "like_id", type = IdType.AUTO)
+    private Integer likeId;
+
+    /**
+     * 被点赞文章id
+     */
+    private String articleId;
+
+    /**
+     * 点赞的人
+     */
+    private Integer authorId;
+
+    /**
+     * 点赞时间
+     */
+    private Date likeDate;
+
+    /**
+     * 点赞人用户名
+     */
+    @TableField(exist = false)
+    private String userName;
+
+    /**
+     * 被点赞的文章标题
+     */
+    @TableField(exist = false)
+    private String articleTitle;
+
+    /**
+     * 被点赞的文章的作者
+     */
+    @TableField(exist = false)
+    private String articleAuthor;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\PageArticle.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/8
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+public class PageArticle extends Model<PageArticle>{
+
+    private String articleId;
+
+    private Integer articleAuthor;
+
+    private String articleTitle;
+
+    private Date articlePostTime;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\PageComment.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/8
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+public class PageComment extends Model<LikeRecord> {
+
+    private String commentAuthorName;
+
+    private String articleId;
+
+    private Integer articleAuthor;
+
+    private String articleTitle;
+
+    private Date commentDate;
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\Type.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("tbl_type")
+public class Type extends Model<Type> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "type_id", type = IdType.AUTO)
+    private Integer typeId;
+
+    private String typeName;
+
+    private String typeDescription;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.typeId;
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\User.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_user")
+public class User extends Model<User> {
+
+    @TableId(value = "user_id", type = IdType.AUTO)
+    private Integer userId;
+
+    private String userName;
+
+    private String userSignature;
+
+    private String userPassword;
+
+    private Integer userRole;
+
+    private Date userCreateDate;
+
+    private Date userLastLoginDate;
+
+    private String userIp;
+
+    @TableField(exist = false)
+    private String roleName;
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\UserInfo.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/3
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+
+
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-03
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_user_info")
+public class UserInfo extends Model<UserInfo> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "user_id", type = IdType.AUTO)
+    private long userId;
+
+    private String userEmail;
+
+    private Integer userSex;
+
+    private String userRegion;
+
+    private Date userBirthdate;
+
+    private String userTelephone;
+
+    private String userRealName;
+
+    private String userSchool;
+
+    private String userMajor;
+
+    private Date userEnterSchoolDate;
+
+    private String userAcademicDegree;
+
+    private String userCompany;
+
+    private String userPosition;
+
+    private String userField;
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\UserLogin.java
+
+
+package com.jancoyan.jancoblog.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-15
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("tbl_user_login")
+public class UserLogin extends Model<UserLogin> {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    private Integer loginUser;
+
+    private Date loginDate;
+
+    private String loginIp;
+
+    private String loginAddress;
+
+    private String userAgent;
+
+    private String browserName;
+
+    private String browserVersion;
+
+    private String osName;
+
+    private String osVersion;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\pojo\VUserTotalData.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/3
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.pojo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+/**
+ * @author Jancoyan
+ * @since 2021-10-03
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+public class VUserTotalData {
+
+    private Integer articleAuthor;
+
+    private String userName;
+
+    private String userSignature;
+
+    private Integer  totalArticle;
+
+    private Integer  totalViewCount;
+
+    private Integer  totalLikeCount;
+
+    private Integer  totalCommentCount;
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\ArticleImageService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.jancoyan.jancoblog.pojo.ArticleImage;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-16
+ */
+public interface ArticleImageService extends IService<ArticleImage> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\ArticleService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.jancoyan.jancoblog.pojo.PageArticle;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface ArticleService extends IService<Article> {
+
+    /**
+     * 获取首页的文章列表
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<Article> listArticleIndex(Integer pn, Integer limit, String condition);
+
+    /**
+     * 文章管理的时候获得用于管理的文章列表
+     * @param userId 用户id，可选
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<Article> listArticleManage(Integer userId, Integer pn, Integer limit, String condition);
+
+    /**
+     * 获取一篇文章
+     * @param articleId 文章id
+     * @return
+     */
+    Article getArticleSingle(String articleId);
+
+    /**
+     * 获取单个已经删除的文章
+     * @param articleId
+     * @return
+     */
+    Article getArticleSingleDeleted(String articleId);
+
+    /**
+     * 获取所有删除的文章
+     * @param userId 用户名，可选
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<Article> listDeleted(Integer userId, Integer pn, Integer limit, String condition);
+
+    /**
+     * 彻底删除已经删除了的文章
+     * @param ids id
+     * @return
+     */
+    boolean deleteCompletely(String ids);
+
+    /**
+     * 批量恢复指定的文章
+     * @param ids ids
+     * @return
+     */
+    boolean batchRecoverDeletedArticle(String ids);
+
+    /**
+     * 批量删除指定文章
+     * @param ids
+     * @return
+     */
+    boolean batchDeleteArticle(String ids);
+
+    /**
+     * 获区用户最近发表的文章
+     * @param id 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<PageArticle> listArticleUserRecently(String id, Integer pn, Integer limit);
+
+    /**
+     * 给文章点赞
+     * @param id 文章id
+     */
+    void addLikeCount(String id);
+
+    /**
+     * 取消文章的点赞
+     * @param id 文章id
+     */
+    void subLikeCount(String id);
+
+    /**
+     * 增加文章的浏览量
+     * @param id
+     */
+    void addViewCount(String id);
+
+    /**
+     * 改变文章是否评论的状态
+     * @param id 文章id
+     * @return
+     */
+    boolean updateIsComment(String id);
+
+    /**
+     * 改变文章的置顶状态
+     * @return
+     */
+    boolean updateIsTop(String id);
+
+    /**
+     * 获取文章用于修改
+     * @return
+     */
+    Article getArticleEdit(String id);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\CommentService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.jancoyan.jancoblog.pojo.PageComment;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface CommentService extends IService<Comment> {
+
+    /**
+     * 评论管理的时候获取所有评论，用户是获得用户的所有评论
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<Comment> listAll(String userId, Integer pn, Integer limit, String condition);
+
+    /**
+     * 获取某个文章的所有评论
+     * @param id 文章id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<Comment> listCommentByArticle(String id, Integer pn, Integer limit);
+
+    /**
+     * 评论管理，获取用户发表的所有评论
+     * @param id 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<Comment> listCommentByUserPosted(String id, Integer pn, Integer limit,
+                                          String condition);
+
+    /**
+     * 获取用户最近获取的评论
+     * @param authorId 作者id
+     * @return
+     */
+    IPage<PageComment> listCommentByUserRecently(String authorId);
+
+
+    /**
+     * 按照文章“删除”评论
+     * @param articleId
+     */
+    void deleteCommentByArticle(String articleId);
+
+    /**
+     * 按照文章“恢复”评论
+     * @param ids 多个id
+     */
+    void recoverCommentByArticle(String ids);
+
+    /**
+     * 批量删除评论
+     * @param ids
+     * @return
+     */
+    boolean batchDeleteComment(String ids);
+
+    /**
+     * 给评论点赞
+     * @param id
+     */
+    void likeComment(Integer id);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\DeletedCommentService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Delete;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-17
+ */
+public interface DeletedCommentService extends IService<DeletedComment> {
+
+
+    IPage<DeletedComment> getCommentByArticle(String id, Integer pn, Integer limit);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\ArticleImageServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.jancoyan.jancoblog.pojo.ArticleImage;
+import com.jancoyan.jancoblog.mapper.ArticleImageMapper;
+import com.jancoyan.jancoblog.service.ArticleImageService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-16
+ */
+@Service
+public class ArticleImageServiceImpl extends ServiceImpl<ArticleImageMapper, ArticleImage> implements ArticleImageService {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\ArticleServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.jancoyan.jancoblog.mapper.ArticleMapper;
+import com.jancoyan.jancoblog.pojo.ArticleImage;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.jancoyan.jancoblog.pojo.PageArticle;
+import com.jancoyan.jancoblog.service.ArticleService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jancoyan.jancoblog.utils.ArticleUtils;
+import com.jancoyan.jancoblog.utils.FileUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Service
+public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+
+    @Override
+    public IPage<Article> listArticleIndex(Integer pn, Integer limit, String condition) {
+
+        //        分页查询
+        IPage<Article> iPage = new Page<>(pn, limit);
+        QueryWrapper<Article> wrapper = new QueryWrapper<>();
+
+        wrapper.orderByDesc("article_rank");
+        wrapper = ArticleUtils.generateManageArticleWrapperByCondition(wrapper, condition);
+        wrapper.orderByDesc("article_post_time");
+
+        return baseMapper.getIndexList(iPage, wrapper);
+    }
+
+    @Override
+    public IPage<Article> listArticleManage(Integer userId,
+                                        Integer pn,
+                                        Integer limit,
+                                        String condition) {
+        //        分页查询
+        IPage<Article> iPage = new Page<>(pn, limit);
+        QueryWrapper<Article> wrapper = new QueryWrapper<>();
+        // 单一用户的文章获取
+        if(null != userId) {
+            wrapper.eq("user_id", userId);
+        }
+
+        wrapper = ArticleUtils.generateManageArticleWrapperByCondition(wrapper, condition);
+
+        wrapper.orderByDesc("article_post_time");
+
+        return baseMapper.getManageList(iPage, wrapper);
+    }
+
+    @Override
+    public Article getArticleSingle(String articleId) {
+        return baseMapper.getSingleArticle(articleId);
+    }
+
+    @Override
+    public Article getArticleSingleDeleted(String articleId) {
+        return baseMapper.getSingleArticleDeleted(articleId);
+    }
+
+    @Override
+    public IPage<Article> listDeleted(Integer userId,
+                                      Integer pn,
+                                      Integer limit,
+                                      String condition) {
+        //        分页查询
+        IPage<Article> iPage = new Page<>(pn, limit);
+        QueryWrapper<Article> wrapper = new QueryWrapper<>();
+        // 单一用户的文章获取
+        if(null != userId) {
+            wrapper.eq("user_id", userId);
+        }
+
+        wrapper = ArticleUtils.generateManageArticleWrapperByCondition(wrapper, condition);
+        wrapper.orderByDesc("article_post_time");
+        return baseMapper.getDeletedList(iPage, wrapper);
+    }
+
+    @Override
+    public boolean deleteCompletely(String ids) {
+        QueryWrapper<ArticleImage> wrapper = new QueryWrapper<>();
+        ArticleImage articleImage = new ArticleImage();
+        QueryWrapper<DeletedComment> deletedCommentQueryWrapper = new QueryWrapper<>();
+        DeletedComment deletedComment = new DeletedComment();
+
+        if(!ids.contains("&")){
+            wrapper.eq("article_id", ids);
+            deletedCommentQueryWrapper.eq("comment_article_id", ids);
+            List<ArticleImage> articleImages = articleImage.selectList(wrapper);
+            for (ArticleImage image : articleImages) {
+                // 依次删除图片文件
+                FileUtils.deleteImageIfExists(image.getInsertDate(), image.getFilename());
+            }
+            // 从表中删除
+            articleImage.delete(wrapper);
+            deletedComment.delete(deletedCommentQueryWrapper);
+            // 删除所有已删除的评论
+            baseMapper.deleteCompletely(ids);
+        } else {
+            String[] id = ids.split("&");
+            for (String item : id) {
+                // 删除图片文件
+                wrapper.eq("article_id", item);
+                deletedCommentQueryWrapper.eq("comment_article_id", item);
+                List<ArticleImage> articleImages = articleImage.selectList(wrapper);
+                for (ArticleImage image : articleImages) {
+                    // 依次删除图片文件
+                    FileUtils.deleteImageIfExists(image.getInsertDate(), image.getFilename());
+                }
+                // 从表中删除
+                articleImage.delete(wrapper);
+                deletedComment.delete(deletedCommentQueryWrapper);
+                // 从文章表中删除文章
+                baseMapper.deleteCompletely(item);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean batchRecoverDeletedArticle(String ids) {
+        if(!ids.contains("&")){
+            baseMapper.batchRecover(ids);
+        } else {
+            String[] id = ids.split("&");
+            for (String item : id) {
+                baseMapper.batchRecover(item);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean batchDeleteArticle(String ids) {
+        Article article = new Article();
+        if(!ids.contains("&")){
+            article.setArticleId(ids);
+            article.deleteById();
+        } else {
+            String[] id = ids.split("&");
+            for (String item : id) {
+                article.setArticleId(item);
+                article.deleteById();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public IPage<PageArticle> listArticleUserRecently(String id, Integer pn, Integer limit) {
+        IPage<PageArticle> iPage = new Page<>(pn, limit);
+        QueryWrapper<PageArticle> wrapper = new QueryWrapper<>();
+        wrapper.eq("article_author", id);
+        wrapper.orderByDesc("article_post_time");
+        return baseMapper.getArticleByUserRecently(iPage, wrapper);
+    }
+
+    @Override
+    public void addLikeCount(String id) {
+        // 增加点赞量
+        Article article = new Article();
+        article.setArticleId(id);
+        article = article.selectById();
+        article.setArticleLikeCount(article.getArticleLikeCount() + 1);
+        article.updateById();
+    }
+
+    @Override
+    public void subLikeCount(String id) {
+        Article article = new Article();
+        article.setArticleId(id);
+        article = article.selectById();
+        article.setArticleLikeCount(article.getArticleLikeCount() - 1);
+        article.updateById();
+    }
+
+    @Override
+    public void addViewCount(String id) {
+        Article article = new Article();
+        article.setArticleId(id);
+        article = article.selectById();
+        article.setArticleViewCount(article.getArticleViewCount() + 1);
+        article.updateById();
+    }
+
+    @Override
+    public boolean updateIsComment(String id) {
+        // 改变评论的状态
+        Article article = new Article();
+        article.setArticleId(id);
+        article = article.selectById();
+        article.setArticleIsComment(1 - article.getArticleIsComment());
+        return article.updateById();
+    }
+
+    @Override
+    public boolean updateIsTop(String id) {
+        // 改变置顶的状态
+        Article article = new Article();
+        article.setArticleId(id);
+        article = article.selectById();
+        article.setArticleRank(1 - article.getArticleRank());
+        return article.updateById();
+    }
+
+    @Override
+    public Article getArticleEdit(String id) {
+        return baseMapper.getArticleEdit(id);
+    }
+
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\CommentServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.Article;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.jancoyan.jancoblog.mapper.CommentMapper;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.jancoyan.jancoblog.pojo.PageComment;
+import com.jancoyan.jancoblog.service.CommentService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.lettuce.core.dynamic.annotation.CommandNaming;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Service
+public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
+
+    @Override
+    public IPage<Comment> listAll(String userId, Integer pn, Integer limit, String condition) {
+
+        // 分页查询
+        IPage<Comment> iPage = new Page<>(pn, limit);
+        QueryWrapper<Comment> wrapper = new QueryWrapper<>();
+
+        if(userId != null) wrapper.eq("user_id", userId);
+
+        String[] split = condition.split("--");
+        for (String item : split) {
+            String[] split2 = item.split("=");
+            if(split2.length < 2){
+                continue;
+            }
+
+            if("comment_author_name".equals(split2[0])){
+                wrapper.like("comment_author_name", split2[1]);
+            }else if("article_title".equals(split2[0])){
+                wrapper.like("article_title", split2[1]);
+            }else if("start".equals(split2[0])){
+                wrapper.gt("comment_date", split2[1]);
+            }else if("end".equals(split2[0])){
+                wrapper.lt("comment_date", split2[1]);
+            }else if("rank_like".equals(split2[0])){
+                if ("1".equals(split2[1])) {
+                    wrapper.orderByAsc("comment_like_count");
+                } else {
+                    wrapper.orderByDesc("comment_like_count");
+                }
+            }
+        }
+        return baseMapper.getAll(iPage, wrapper);
+    }
+
+    @Override
+    public IPage<Comment> listCommentByArticle(String id, Integer pn, Integer limit) {
+        QueryWrapper<Comment> wrapper = new QueryWrapper<>();
+        IPage<Comment> page = new Page<>(pn, limit);
+        wrapper.eq("comment_article_id", id);
+        wrapper.orderByDesc("comment_date");
+        return baseMapper.getCommentByArticle(page, wrapper);
+    }
+
+    @Override
+    public IPage<Comment> listCommentByUserPosted(String id, Integer pn, Integer limit, String condition) {
+
+        // 分页查询
+        IPage<Comment> iPage = new Page<>(pn, limit);
+        QueryWrapper<Comment> wrapper = new QueryWrapper<>();
+
+        if(id != null) {
+            wrapper.eq("comment_author_id", id);
+        }
+
+        String[] split = condition.split("--");
+        for (String item : split) {
+            String[] split2 = item.split("=");
+            if(split2.length < 2){
+                continue;
+            }
+
+            if("comment_author_name".equals(split2[0])){
+                wrapper.like("user_id", split2[1]);
+            }else if("article_title".equals(split2[0])){
+                wrapper.like("article_title", split2[1]);
+            }else if("start".equals(split2[0])){
+                wrapper.gt("comment_date", split2[1]);
+            }else if("end".equals(split2[0])){
+                wrapper.lt("comment_date", split2[1]);
+            }else if("rank_like".equals(split2[0])){
+                if ("1".equals(split2[1])) {
+                    wrapper.orderByAsc("comment_like_count");
+                } else {
+                    wrapper.orderByDesc("comment_like_count");
+                }
+            }
+        }
+        return baseMapper.getCommentByUserPosted(iPage, wrapper);
+    }
+
+    @Override
+    public IPage<PageComment> listCommentByUserRecently(String authorId) {
+        IPage<PageComment> iPage = new Page<>(1, 10);
+        QueryWrapper<PageComment> wrapper = new QueryWrapper<>();
+        wrapper.eq("article_author", authorId);
+        wrapper.orderByDesc("comment_date");
+        return baseMapper.getCommentByUserRecently(iPage, wrapper);
+
+    }
+
+    @Override
+    public void deleteCommentByArticle(String ids) {
+        // 先查出来评论，再依次删除
+        QueryWrapper<Comment> wrapper = new QueryWrapper<>();
+        Comment comment = new Comment();
+        Article article = new Article();
+        if(!ids.contains("&")){
+            // 将删除文章的评论挪到另一张表中
+            wrapper.eq("comment_article_id", ids);
+            List<Comment> list = comment.selectList(wrapper);
+            if(!list.isEmpty()){
+                for (Comment item : list){
+                    baseMapper.deleteComment(item.getCommentId());
+                }
+            }
+        } else {
+            String[] id = ids.split("&");
+            for (String articleId : id) {
+                wrapper.eq("comment_article_id", articleId);
+                List<Comment> list = comment.selectList(wrapper);
+                if(!list.isEmpty()){
+                    for (Comment item : list){
+                        baseMapper.deleteComment(item.getCommentId());
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void recoverCommentByArticle(String ids) {
+        QueryWrapper<DeletedComment> wrapper = new QueryWrapper<>();
+        DeletedComment comment = new DeletedComment();
+        // 先查出来评论，再依次恢复
+        if(!ids.contains("&")){
+            wrapper.eq("comment_article_id", ids);
+            List<DeletedComment> list = comment.selectList(wrapper);
+            if(!list.isEmpty()){
+                for (DeletedComment item : list){
+                    baseMapper.recoverComment(item.getCommentId());
+                }
+            }
+        } else {
+            String[] id = ids.split("&");
+            for (String article : id) {
+                wrapper.eq("comment_article_id", article);
+                List<DeletedComment> list = comment.selectList(wrapper);
+                if(!list.isEmpty()){
+                    for (DeletedComment item : list){
+                        baseMapper.recoverComment(item.getCommentId());
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean batchDeleteComment(String ids) {
+        Comment comment = new Comment();
+        boolean suc = false;
+        if(!ids.contains("&")){
+            comment.setCommentId(Integer.parseInt(ids));
+            suc = comment.deleteById();
+        } else {
+            String[] id = ids.split("&");
+            for (String item : id) {
+                comment.setCommentId(Integer.parseInt(item));
+                suc = comment.deleteById();
+            }
+        }
+        return suc;
+    }
+
+    @Override
+    public void likeComment(Integer id) {
+        Comment comment = new Comment();
+        comment.setCommentId(id);
+        comment = comment.selectById();
+        comment.setCommentLikeCount(comment.getCommentLikeCount() + 1);
+        comment.updateById();
+    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\DeletedCommentServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.Comment;
+import com.jancoyan.jancoblog.pojo.DeletedComment;
+import com.jancoyan.jancoblog.mapper.DeletedCommentMapper;
+import com.jancoyan.jancoblog.service.DeletedCommentService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-17
+ */
+@Service
+public class DeletedCommentServiceImpl extends ServiceImpl<DeletedCommentMapper, DeletedComment> implements DeletedCommentService {
+
+    @Override
+    public IPage<DeletedComment> getCommentByArticle(String id, Integer pn, Integer limit) {
+        QueryWrapper<DeletedComment> wrapper = new QueryWrapper<>();
+        IPage<DeletedComment> page = new Page<>(pn, limit);
+        wrapper.eq("comment_article_id", id);
+        wrapper.orderByDesc("comment_date");
+        return baseMapper.getCommentByArticle(page, wrapper);
+    }
+
+
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\LikeRecordServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.LikeRecord;
+import com.jancoyan.jancoblog.mapper.LikeRecordMapper;
+import com.jancoyan.jancoblog.service.LikeRecordService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-06
+ */
+@Service
+public class LikeRecordServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRecord> implements LikeRecordService {
+
+    @Override
+    public IPage<LikeRecord> getUserReceive(String userId, Integer pn, Integer limit) {
+        IPage<LikeRecord> iPage = new Page<>(pn, limit);
+        QueryWrapper<LikeRecord> wrapper = new QueryWrapper<>();
+
+        wrapper.eq("article_author", userId);
+
+        wrapper.orderByDesc("like_date");
+        return baseMapper.getUserReceive(iPage, wrapper, userId);
+    }
+
+
+    @Override
+    public void insertRecord(Integer userId, String articleId) {
+        LikeRecord record = new LikeRecord();
+        record.setAuthorId(userId);
+        record.setLikeDate(new Date());
+        record.setArticleId(articleId);
+        record.insert();
+    }
+
+    @Override
+    public void deleteRecord(Integer userId, String articleId) {
+        LikeRecord record = new LikeRecord();
+        QueryWrapper<LikeRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("article_id", articleId);
+        wrapper.eq("author_id", userId);
+        record.delete(wrapper);
+    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\TypeServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.jancoyan.jancoblog.pojo.Type;
+import com.jancoyan.jancoblog.mapper.TypeMapper;
+import com.jancoyan.jancoblog.service.TypeService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Service
+public class TypeServiceImpl extends ServiceImpl<TypeMapper, Type> implements TypeService {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\UserInfoServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.jancoyan.jancoblog.mapper.UserInfoMapper;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+import com.jancoyan.jancoblog.service.UserInfoService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-14
+ */
+@Service
+public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\UserLoginServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.jancoyan.jancoblog.pojo.UserLogin;
+import com.jancoyan.jancoblog.mapper.UserLoginMapper;
+import com.jancoyan.jancoblog.service.UserLoginService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-15
+ */
+@Service
+public class UserLoginServiceImpl extends ServiceImpl<UserLoginMapper, UserLogin> implements UserLoginService {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\impl\UserServiceImpl.java
+
+
+package com.jancoyan.jancoblog.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jancoyan.jancoblog.pojo.User;
+import com.jancoyan.jancoblog.mapper.UserMapper;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+import com.jancoyan.jancoblog.pojo.VUserTotalData;
+import com.jancoyan.jancoblog.service.UserService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jancoyan.jancoblog.utils.MD5Util;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+@Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    @Override
+    public IPage<User> getAll(Integer pn, Integer limit, String condition) {
+        // 分页查询
+        IPage<User> iPage = new Page<>(pn, limit);
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+
+        String[] split = condition.split("--");
+        for (String item : split) {
+            String[] split2 = item.split("=");
+            if(split2.length < 2){
+                continue;
+            }
+            if("user_name".equals(split2[0])){
+                wrapper.like("user_name", split2[1]);
+            }else if("start".equals(split2[0])){
+                wrapper.gt("user_create_date", split2[1]);
+            }else if("end".equals(split2[0])){
+                wrapper.lt("user_create_date", split2[1]);
+            }
+        }
+        return baseMapper.getAll(iPage, wrapper);
+    }
+
+    @Override
+    public VUserTotalData getUserTotalData(String userId) {
+        return baseMapper.getUserTotalData(userId);
+    }
+
+    @Override
+    public UserInfo getUserInfo(Integer userId) {
+        return baseMapper.getUserInfo(userId);
+    }
+
+    @Override
+    public User login(String username, String password) {
+        // 登录数据校验
+        password = MD5Util.getMD5(password);
+        return baseMapper.login(username, password);
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\LikeRecordService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.LikeRecord;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-06
+ */
+public interface LikeRecordService extends IService<LikeRecord> {
+
+    /**
+     * 获取用户收到的点赞列表（时间顺序）
+     * @param userId 用户id
+     * @param pn 页码
+     * @param limit 容量
+     * @return
+     */
+    IPage<LikeRecord> getUserReceive(String userId, Integer pn, Integer limit);
+
+    /**
+     * 增加点赞记录
+     * @param userId 用户id
+     * @param articleId 文章id
+     */
+    void insertRecord(Integer userId, String articleId);
+
+    /**
+     * 删除点赞记录
+     * @param userId 用户id
+     * @param articleId 文章id
+     */
+    void deleteRecord(Integer userId, String articleId);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\TypeService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.jancoyan.jancoblog.pojo.Type;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface TypeService extends IService<Type> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\UserInfoService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-14
+ */
+public interface UserInfoService extends IService<UserInfo> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\UserLoginService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.jancoyan.jancoblog.pojo.UserLogin;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-10-15
+ */
+public interface UserLoginService extends IService<UserLogin> {
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\service\UserService.java
+
+
+package com.jancoyan.jancoblog.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jancoyan.jancoblog.pojo.User;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.jancoyan.jancoblog.pojo.UserInfo;
+import com.jancoyan.jancoblog.pojo.VUserTotalData;
+
+import java.util.List;
+
+/**
+ * <p>
+ *  服务类
+ * </p>
+ *
+ * @author Jancoyan
+ * @since 2021-09-14
+ */
+public interface UserService extends IService<User> {
+
+    /**
+     * 管理员管理的时候获取所有用户
+     * @param pn 页码
+     * @param limit 容量
+     * @param condition 条件
+     * @return
+     */
+    IPage<User> getAll(Integer pn, Integer limit, String condition);
+
+    /**
+     * 获取用户汇总信息，用于数据展板
+     * @param userId 用户id
+     * @return
+     */
+    VUserTotalData getUserTotalData(String userId);
+
+    /**
+     * 获取用户登录信息
+     * @param userId 用户id
+     * @return
+     */
+    UserInfo getUserInfo(Integer userId);
+
+    User login(String username, String password);
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\ArticleUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/7/1
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jancoyan.jancoblog.pojo.Article;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ArticleUtils {
+
+
+    /**
+     * 获取管理文章时候的wrapper，只有从 v_article_manage_show 中查询的时候才能用这个util
+     * @param condition 条件
+     * @return wrapper
+     */
+    public static QueryWrapper<Article> generateManageArticleWrapperByCondition(QueryWrapper<Article> wrapper,
+                                                                                  String condition){
+
+        String[] split = condition.split("--");
+        for (String item : split) {
+            String[] split2 = item.split("=");
+            if(split2.length < 2){
+                continue;
+            }
+
+            if("article_author_name".equals(split2[0])){
+                wrapper.like("user_name", split2[1]);
+            }else if("article_title".equals(split2[0])){
+                wrapper.like("article_title", split2[1]);
+            }else if("type".equals(split2[0])){
+                wrapper.eq("article_type", split2[1]);
+            }else if("start".equals(split2[0])){
+                wrapper.gt("article_post_time", split2[1]);
+            }else if("end".equals(split2[0])){
+                wrapper.lt("article_post_time", split2[1]);
+            }else if("rank_view".equals(split2[0])){
+                if ("1".equals(split2[1])) {
+                    wrapper.orderByAsc("article_view_count");
+                } else {
+                    wrapper.orderByDesc("article_view_count");
+                }
+            }else if("rank_like".equals(split2[0])){
+                if ("1".equals(split2[1])) {
+                    wrapper.orderByAsc("article_like_count");
+                } else {
+                    wrapper.orderByDesc("article_like_count");
+                }
+            }else if("rank_comment".equals(split2[0])){
+                if ("1".equals(split2[1])) {
+                    wrapper.orderByAsc("article_comment_count");
+                } else {
+                    wrapper.orderByDesc("article_comment_count");
+                }
+            }
+        }
+
+        return wrapper;
+    }
+    /**
+     * 把换行的\n转换为文本的\n
+     * @param str 要替换的文本
+     * @return 替换完毕的文本
+     */
+    public static String nextLineToText(String str){
+        return str.replaceAll("\n", "\\\\n");
+    }
+
+    /**
+     * 把单引号替换为 \' 进行转义
+     * @param str 文章的内容
+     * @return 转换好的文章
+     */
+    public static String replaceSingleSlash(String str){
+        return str.replaceAll("'", "\\\\'");
+    }
+
+    /**
+     * 获取文章的默认摘要
+     * @param innerHTML 作者写入的md转成的html（带有格式）
+     * @return 文章的摘要
+     */
+    public static String getArticleDefaultSummary(String innerHTML){
+        // 去掉所有的HTML标签
+        String rst = innerHTML.replaceAll("<.*?>", "");
+        // 转换所有的空格
+        rst = rst.replaceAll("\\s", " ");
+        // 过长截取
+        if(rst.length() >= 100){
+            rst = rst.substring(0, 100) + "......";
+        }
+        return rst;
+    }
+
+    /**
+     * 获取文章id
+     * @param userId 用户id
+     * @return 文章id
+     */
+    public static String getArticleId(Integer userId, long now){
+        String str = String.valueOf(userId);
+        str += String.valueOf(now);
+        return str;
+    }
+
+
+    /**
+     * 标准化博文中的图片，宽度调整为容器大小的70%
+     * @param html
+     * @return
+     */
+    public static String simplifyImages(String html){
+        return html.replaceAll("<img src", "<img style=\"max-width:70%\" src");
+    }
+
+
+    /**
+     * 获取文章中的图片名称
+     * @param html html标签
+     * @return
+     */
+    public static List<String> getPicturesInArticle(String html){
+        String regex = "src=\".*?\"";
+
+        Pattern p = Pattern.compile(regex);
+        Matcher matcher = p.matcher(html);
+        List<String> fileNames = new ArrayList<>(16);
+        while (matcher.find()){
+            // 当前匹配到的字符串
+            String fileName = matcher.group();
+            fileName = fileName.substring(fileName.lastIndexOf('/') + 1, fileName.length() - 1);
+            fileNames.add(fileName);
+            System.out.println(fileName);
+        }
+
+        return fileNames;
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\AvatarUtil.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/11/17
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
+
+/**
+ * 根据姓名创建图片
+ */
+public class AvatarUtil {
+    /**
+     * 绘制字体头像
+     * 如果是英文名，只显示首字母大写
+     * 如果是中文名，只显示最后两个字
+     * @param name
+     * @param outputPath
+     * @param outputName
+     * @throws IOException
+     */
+    public static void generateImg(String name, String outputPath, String outputName)
+            throws IOException {
+        int width = 100;
+        int height = 100;
+        int nameLen = name.length();
+        String nameWritten;
+        //如果用户输入的姓名少于等于2个字符，不用截取
+        if (nameLen <= 2) {
+            nameWritten = name;
+        } else {
+            //如果用户输入的姓名大于等于3个字符，截取后面两位
+            String first = name.substring(0, 1);
+            if (isChinese(first)) {
+                //截取倒数两位汉字
+                nameWritten = name.substring(nameLen - 2);
+            } else {
+                //截取前面的两个英文字母
+                nameWritten = name.substring(0, 2).toUpperCase();
+            }
+        }
+        String filename = outputPath + File.separator + outputName + ".png";
+        File file = new File(filename);
+        //Font font = new Font("微软雅黑", Font.PLAIN, 30);
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = (Graphics2D) bi.getGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setBackground(getRandomColor());
+        g2.clearRect(0, 0, width, height);
+        g2.setPaint(Color.WHITE);
+        Font font = null;
+        //两个字及以上
+        if(nameWritten.length() >= 2) {
+            font = new Font("微软雅黑", Font.PLAIN, 30);
+            g2.setFont(font);
+            String firstWritten = nameWritten.substring(0, 1);
+            String secondWritten = nameWritten.substring(1, 2);
+            //两个中文 如 言曌
+            if (isChinese(firstWritten) && isChinese(secondWritten)) {
+                g2.drawString(nameWritten, 20, 60);
+            }
+            //首中次英 如 罗Q
+            else if (isChinese(firstWritten) && !isChinese(secondWritten)) {
+                g2.drawString(nameWritten, 27, 60);
+                //首英,如 AB
+            } else {
+                nameWritten = nameWritten.substring(0,1);
+            }
+        }
+        //一个字
+        if(nameWritten.length() ==1) {
+            //中文
+            if(isChinese(nameWritten)) {
+                font = new Font("微软雅黑", Font.PLAIN, 50);
+                g2.setFont(font);
+                g2.drawString(nameWritten, 25, 70);
+            }
+            //英文
+            else {
+                font = new Font("微软雅黑", Font.PLAIN, 55);
+                g2.setFont(font);
+                g2.drawString(nameWritten.toUpperCase(), 33, 67);
+            }
+        }
+        BufferedImage rounded = makeRoundedCorner(bi, 99);
+        ImageIO.write(rounded, "png", file);
+    }
+    /**
+     * 判断字符串是否为中文
+     * @param str
+     * @return
+     */
+    public static boolean isChinese(String str) {
+        String regEx = "[\\u4e00-\\u9fa5]+";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        if (m.find())
+            return true;
+        else
+            return false;
+    }
+    /**
+     * 获得随机颜色
+     * @return
+     */
+    private static Color getRandomColor() {
+        String[] beautifulColors =
+                new String[]{"232,221,203", "205,179,128", "3,101,100", "3,54,73", "3,22,52",
+                        "237,222,139", "251,178,23", "96,143,159", "1,77,103", "254,67,101", "252,157,154",
+                        "249,205,173", "200,200,169", "131,175,155", "229,187,129", "161,23,21", "34,8,7",
+                        "118,77,57", "17,63,61", "60,79,57", "95,92,51", "179,214,110", "248,147,29",
+                        "227,160,93", "178,190,126", "114,111,238", "56,13,49", "89,61,67", "250,218,141",
+                        "3,38,58", "179,168,150", "222,125,44", "20,68,106", "130,57,53", "137,190,178",
+                        "201,186,131", "222,211,140", "222,156,83", "23,44,60", "39,72,98", "153,80,84",
+                        "217,104,49", "230,179,61", "174,221,129", "107,194,53", "6,128,67", "38,157,128",
+                        "178,200,187", "69,137,148", "117,121,71", "114,83,52", "87,105,60", "82,75,46",
+                        "171,92,37", "100,107,48", "98,65,24", "54,37,17", "137,157,192", "250,227,113",
+                        "29,131,8", "220,87,18", "29,191,151", "35,235,185", "213,26,33", "160,191,124",
+                        "101,147,74", "64,116,52", "255,150,128", "255,94,72", "38,188,213", "167,220,224",
+                        "1,165,175", "179,214,110", "248,147,29", "230,155,3", "209,73,78", "62,188,202",
+                        "224,160,158", "161,47,47", "0,90,171", "107,194,53", "174,221,129", "6,128,67",
+                        "38,157,128", "201,138,131", "220,162,151", "137,157,192", "175,215,237", "92,167,186",
+                        "255,66,93", "147,224,255", "247,68,97", "185,227,217"};
+        int len = beautifulColors.length;
+        Random random = new Random();
+        String[] color = beautifulColors[random.nextInt(len)].split(",");
+        return new Color(Integer.parseInt(color[0]), Integer.parseInt(color[1]),
+                Integer.parseInt(color[2]));
+    }
+    /**
+     * 图片做圆角处理
+     * @param image
+     * @param cornerRadius
+     * @return
+     */
+    public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = output.createGraphics();
+        g2.setComposite(AlphaComposite.Src);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(Color.WHITE);
+        g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius));
+        g2.setComposite(AlphaComposite.SrcAtop);
+        g2.drawImage(image, 0, 0, null);
+        g2.dispose();
+        return output;
+    }
+}R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\ConstantUtil.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/23
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+public class ConstantUtil {
+
+//    public static final String STATIC_RESOURCES =  "C:/Users/Administrator/Pictures/webstatic";
+//    public static final String STATIC_URL = "http://localhost:8000";
+
+//    deploy
+    public static final String STATIC_RESOURCES =  "/home/jancoyan/springbootApp/blog/static";
+    public static final String STATIC_URL = "http://101.201.64.102:8000";
+
+}R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\FileUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/16
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class FileUtils {
+
+
+    /**
+     * 删除文章中的指定图片
+     * @param date 日期
+     * @param imageName 图片的名称
+     */
+    public static void deleteImageIfExists(Date date, String imageName)  {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+        String formatMonth = simpleDateFormat.format(date);
+        String path = null;
+        path = ConstantUtil.STATIC_RESOURCES + "/p/" + formatMonth + "/" + imageName;
+        File file = new File(path);
+        if(file.exists()){
+            file.delete();
+        }
+    }
+
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\JsonWebTokenUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/25
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class JsonWebTokenUtils {
+
+    /** token秘钥，请勿泄露，请勿随便修改 backups:JKKLJOoasdlfj */
+    public static final String SECRET = "JKKLJOoasdlfj";
+    /** token 过期时间: 1天 */
+    public static final int calendarField = Calendar.DATE;
+    public static final int calendarInterval = 1;
+
+    /**
+     * JWT生成Token.<br/>
+     * JWT构成: header, payload, signature
+     * @param user_id 登录成功后用户user_id, 参数user_id不可传空
+     */
+    public static String createToken(Long user_id){
+        Date iatDate = new Date();
+        // expire time
+        Calendar nowTime = Calendar.getInstance();
+        nowTime.add(calendarField, calendarInterval);
+        Date expiresDate = nowTime.getTime();
+
+        // header Map
+        Map<String, Object> map = new HashMap<>();
+        map.put("alg", "HS256");
+        map.put("typ", "JWT");
+
+        // build token
+        // param backups {iss:Service, aud:APP}
+        String token = JWT.create().withHeader(map) // header
+                .withClaim("iss", "Service") // payload
+                .withClaim("aud", "APP")
+                .withClaim("user_id", null == user_id ? null : user_id.toString())
+                .withIssuedAt(iatDate) // sign time
+                .withExpiresAt(expiresDate) // expire time
+                .sign(Algorithm.HMAC256(SECRET)); // signature
+
+        return token;
+    }
+
+    /**
+     * 解密Token
+     * @param token token字符串
+     * @return  对token进行解密
+     * @throws Exception token非法异常
+     */
+    public static Map<String, Claim> verifyToken(String token) {
+//        String[] header = token.split("Bearer");
+//        token = header[1];
+        DecodedJWT jwt = null;
+        try {
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
+            jwt = verifier.verify(token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Token 非法");
+        }
+        return jwt.getClaims();
+    }
+
+    /**
+     * 根据Token获取user_id
+     * @param token token
+     * @return user_id
+     */
+    public static Long getAppUID(String token) {
+        Map<String, Claim> claims = verifyToken(token);
+        Claim user_id_claim = claims.get("user_id");
+        if (null == user_id_claim || "".equals(user_id_claim.asString())) {
+            // token 校验失败, 抛出Token验证非法异常
+            System.out.println("token 验证非法");
+        }
+        return Long.valueOf(user_id_claim.asString());
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\MD5Util.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/18
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class MD5Util {
+    public static String getMD5(String password) {
+        try {
+            // 得到一个信息摘要器
+            MessageDigest digest = MessageDigest.getInstance("md5");
+            byte[] result = digest.digest(password.getBytes());
+            StringBuffer buffer = new StringBuffer();
+            // 把每一个byte 做一个与运算 0xff;
+            for (byte b : result) {
+                // 与运算
+                int number = b & 0xff;// 加盐
+                String str = Integer.toHexString(number);
+                if (str.length() == 1) {
+                    buffer.append("0");
+                }
+                buffer.append(str);
+            }
+
+            // 标准的md5加密后的结果
+            return buffer.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\Msg.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/14
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+
+import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 通用的返回的类
+ * @author Jancoyan
+ */
+@Data
+public class Msg {
+    /**
+     * 状态码
+     * 100-成功
+     * 200-失败
+     *
+     * */
+    private int code;
+    //提示信息
+    private String msg;
+
+    //用户要返回给浏览器的数据
+    private Map<String, Object> extend = new HashMap<String, Object>();
+
+    /**
+     * 用户信息过期
+     * @return 结果
+     */
+    public static Msg expire(){
+        Msg result = new Msg();
+        result.setCode(601);
+        result.setMsg("用户信息已过期");
+        return result;
+    }
+
+    /**
+     * 非法token
+     * @return 结果
+     */
+    public static Msg illegalToken(){
+        Msg result = new Msg();
+        result.setCode(602);
+        result.setMsg("登录信息无效");
+        return result;
+    }
+
+    /**
+     * 数据传输成功
+     * @return 结果
+     */
+    public static Msg success(){
+        Msg result = new Msg();
+        result.setCode(100);
+        result.setMsg("成功");
+        return result;
+    }
+
+    /**
+     * 用户未登录
+     * @return 结果
+     */
+    public static Msg loginNeeded(){
+        Msg result = new Msg();
+        result.setCode(603);
+        result.setMsg("用户未登录");
+        return result;
+    }
+
+    /**
+     * 数据传输失败
+     * @return 结果
+     */
+    public static Msg fail(){
+        Msg result = new Msg();
+        result.setCode(200);
+        result.setMsg("失败！");
+        return result;
+    }
+
+    public Msg add(String key,Object value){
+        this.getExtend().put(key, value);
+        return this;
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\NetworkUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/15
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+public class NetworkUtils {
+
+    /**
+     * 查找ip归属地
+     * @param ip ip地址
+     * @return
+     */
+    public static String queryAddressByIp(String ip) {
+        String address = null;
+        try {
+            address = getAddress(ip);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return address;
+    }
+
+
+    /**
+     * 获取地址
+     * @param ip
+     * @return
+     * @throws Exception
+     */
+    private static String getAddress(String ip) throws Exception{
+
+        String path = "https://ip.taobao.com//outGetIpInfo?ip=" + ip + "&accessKey=alibaba-inc";
+        String returnStr = getRs(path);
+        JSONObject json;
+
+        if(returnStr != null){
+            json = new JSONObject(returnStr);
+            if("0".equals(json.get("code").toString())){
+                StringBuffer buffer = new StringBuffer();
+                //国家
+                buffer.append(decodeUnicode(json.optJSONObject("data").getString("country")));
+                //省份
+                buffer.append(decodeUnicode(json.optJSONObject("data").getString("region")));
+                //市区
+                buffer.append(decodeUnicode(json.optJSONObject("data").getString("city")));
+                return buffer.toString();
+            }else{
+                return "获取地址失败";
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从url获取结果
+     * @param path
+     * @param params
+     * @param encoding
+     * @return
+     */
+    private static String getRs(String path){
+
+        URL url = null;
+        HttpURLConnection connection = null;
+
+        try {
+
+            url = new URL(path);
+            // 新建连接实例
+            connection = (HttpURLConnection)url.openConnection();
+
+            // 设置连接超时时间，单位毫秒
+            connection.setConnectTimeout(2000);
+            // 设置读取数据超时时间，单位毫秒
+            connection.setReadTimeout(2000);
+            // 是否打开输出流 true|false
+            connection.setDoInput(true);
+            // 是否打开输入流true|false
+            connection.setDoOutput(true);
+            // 提交方法POST|GET
+            connection.setRequestMethod("POST");
+            // 是否缓存true|false
+            connection.setUseCaches(false);
+            // 打开连接端口
+            connection.connect();
+
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+
+            out.writeBytes(path);
+            out.flush();
+            out.close();
+
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder buffer = new StringBuilder();
+            String line = "";
+
+            while ((line = reader.readLine())!= null) {
+                buffer.append(line);
+            }
+            reader.close();
+            return buffer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            connection.disconnect();// 关闭连接
+        }
+        return null;
+    }
+
+
+    /**
+     * 对字符串进行解码
+     * @param theString
+     * @return
+     */
+    private static String decodeUnicode(String theString){
+        char aChar;
+        int len = theString.length();
+        StringBuffer buffer = new StringBuffer(len);
+        for (int i = 0; i < len;) {
+            aChar = theString.charAt(i++);
+            if(aChar == '\\'){
+                aChar = theString.charAt(i++);
+                if(aChar == 'u'){
+                    int val = 0;
+                    for(int j = 0; j < 4; j++){
+                        aChar = theString.charAt(i++);
+                        switch (aChar) {
+                            case '0':case '1':case '2':case '3':
+                            case '4':case '5':case '6':case '7':
+                            case '8':case '9':
+                                val = (val << 4) + aChar - '0';
+                                break;
+                            case 'a':case 'b':case 'c':case 'd':
+                            case 'e':case 'f':
+                                val = (val << 4) + 10 + aChar - 'a';
+                                break;
+                            case 'A':case 'B':case 'C':case 'D':
+                            case 'E':case 'F':
+                                val = (val << 4) + 10 + aChar - 'A';
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Malformed      encoding.");
+                        }
+                    }
+                    buffer.append((char) val);
+                }else{
+                    if(aChar == 't'){ aChar = '\t';}
+                    if(aChar == 'r'){ aChar = '\r';}
+                    if(aChar == 'n'){ aChar = '\n';}
+                    if(aChar == 'f'){ aChar = '\f';}
+                    buffer.append(aChar);
+                }
+            }else{
+                buffer.append(aChar);
+            }
+        }
+        return buffer.toString();
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\RedisUtil.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/9/25
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+@Component
+public class RedisUtil {
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    // =============================common============================
+
+    /**
+     * 指定缓存失效时间
+     *
+     * @param key  键
+     * @param time 时间(秒)
+     */
+    public boolean expire(String key, long time) {
+        try {
+            if (time > 0) {
+                redisTemplate.expire(key, time, TimeUnit.SECONDS);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 根据key 获取过期时间
+     *
+     * @param key 键 不能为null
+     * @return 时间(秒) 返回0代表为永久有效
+     */
+    public long getExpire(String key) {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 判断key是否存在
+     *
+     * @param key 键
+     * @return true 存在 false不存在
+     */
+    public boolean hasKey(String key) {
+        try {
+            return redisTemplate.hasKey(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 删除缓存
+     * @param key 可以传一个值 或多个
+     */
+    @SuppressWarnings("unchecked")
+    public void del(String... key) {
+        if (key != null && key.length > 0) {
+            if (key.length == 1) {
+                redisTemplate.delete(key[0]);
+            } else {
+                redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
+            }
+        }
+    }
+    // ============================String=============================
+
+    /**
+     * 普通缓存获取
+     *
+     * @param key 键
+     * @return 值
+     */
+    public Object get(String key) {
+        return key == null ? null : redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 普通缓存放入
+     *
+     * @param key   键
+     * @param value 值
+     * @return true成功 false失败
+     */
+    public boolean set(String key, Object value) {
+        try {
+            redisTemplate.opsForValue().set(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 普通缓存放入并设置时间
+     *
+     * @param key   键
+     * @param value 值
+     * @param time  时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @return true成功 false 失败
+     */
+    public boolean set(String key, Object value, long time) {
+        try {
+            if (time > 0) {
+                redisTemplate.opsForValue().set(key, value, time,
+                        TimeUnit.SECONDS);
+            } else {
+                set(key, value);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 递增
+     *
+     * @param key   键
+     * @param delta 要增加几(大于0)
+     */
+    public long incr(String key, long delta) {
+        if (delta < 0) {
+            throw new RuntimeException("递增因子必须大于0");
+        }
+        return redisTemplate.opsForValue().increment(key, delta);
+    }
+
+    /**
+     * 递减
+     *
+     * @param key   键
+     * @param delta 要减少几(小于0)
+     */
+    public long decr(String key, long delta) {
+        if (delta < 0) {
+            throw new RuntimeException("递减因子必须大于0");
+        }
+        return redisTemplate.opsForValue().increment(key, -delta);
+    }
+    // ================================Map=================================
+
+    /**
+     * HashGet
+     *
+     * @param key  键 不能为null
+     * @param item 项 不能为null
+     */
+    public Object hget(String key, String item) {
+        return redisTemplate.opsForHash().get(key, item);
+    }
+
+    /**
+     * 获取hashKey对应的所有键值
+     *
+     * @param key 键
+     * @return 对应的多个键值
+     */
+    public Map<Object, Object> hmget(String key) {
+        return redisTemplate.opsForHash().entries(key);
+    }
+
+    /**
+     * HashSet
+     *
+     * @param key 键
+     * @param map 对应多个键值
+     */
+    public boolean hmset(String key, Map<String, Object> map) {
+        try {
+            redisTemplate.opsForHash().putAll(key, map);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * HashSet 并设置时间
+     *
+     * @param key  键
+     * @param map  对应多个键值
+     * @param time 时间(秒)
+     * @return true成功 false失败
+     */
+    public boolean hmset(String key, Map<String, Object> map, long time) {
+        try {
+            redisTemplate.opsForHash().putAll(key, map);
+            if (time > 0) {
+                expire(key, time);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 向一张hash表中放入数据,如果不存在将创建
+     *
+     * @param key   键
+     * @param item  项
+     * @param value 值
+     * @return true 成功 false失败
+     */
+    public boolean hset(String key, String item, Object value) {
+        try {
+            redisTemplate.opsForHash().put(key, item, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 向一张hash表中放入数据,如果不存在将创建
+     *
+     * @param key   键
+     * @param item  项
+     * @param value 值
+     * @param time  时间(秒) 注意:如果已存在的hash表有时间,这里将会替换原有的时间
+     * @return true 成功 false失败
+     */
+    public boolean hset(String key, String item, Object value, long time) {
+        try {
+            redisTemplate.opsForHash().put(key, item, value);
+            if (time > 0) {
+                expire(key, time);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 删除hash表中的值
+     *
+     * @param key  键 不能为null
+     * @param item 项 可以使多个 不能为null
+     */
+    public void hdel(String key, Object... item) {
+        redisTemplate.opsForHash().delete(key, item);
+    }
+
+    /**
+     * 判断hash表中是否有该项的值
+     *
+     * @param key  键 不能为null
+     * @param item 项 不能为null
+     * @return true 存在 false不存在
+     */
+    public boolean hHasKey(String key, String item) {
+        return redisTemplate.opsForHash().hasKey(key, item);
+    }
+
+    /**
+     * hash递增 如果不存在,就会创建一个 并把新增后的值返回
+     *
+     * @param key  键
+     * @param item 项
+     * @param by   要增加几(大于0)
+     */
+    public double hincr(String key, String item, double by) {
+        return redisTemplate.opsForHash().increment(key, item, by);
+    }
+
+    /**
+     * hash递减
+     *
+     * @param key  键
+     * @param item 项
+     * @param by   要减少记(小于0)
+     */
+    public double hdecr(String key, String item, double by) {
+        return redisTemplate.opsForHash().increment(key, item, -by);
+    }
+    // ============================set=============================
+
+    /**
+     * 根据key获取Set中的所有值
+     *
+     * @param key 键
+     */
+    public Set<Object> sGet(String key) {
+        try {
+            return redisTemplate.opsForSet().members(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 根据value从一个set中查询,是否存在
+     *
+     * @param key   键
+     * @param value 值
+     * @return true 存在 false不存在
+     */
+    public boolean sHasKey(String key, Object value) {
+        try {
+            return redisTemplate.opsForSet().isMember(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 将数据放入set缓存
+     *
+     * @param key    键
+     * @param values 值 可以是多个
+     * @return 成功个数
+     */
+    public long sSet(String key, Object... values) {
+        try {
+            return redisTemplate.opsForSet().add(key, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 将set数据放入缓存
+     *
+     * @param key    键
+     * @param time   时间(秒)
+     * @param values 值 可以是多个
+     * @return 成功个数
+     */
+    public long sSetAndTime(String key, long time, Object... values) {
+        try {
+            Long count = redisTemplate.opsForSet().add(key, values);
+            if (time > 0)
+                expire(key, time);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获取set缓存的长度
+     *
+     * @param key 键
+     */
+    public long sGetSetSize(String key) {
+        try {
+            return redisTemplate.opsForSet().size(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 移除值为value的
+     *
+     * @param key    键
+     * @param values 值 可以是多个
+     * @return 移除的个数
+     */
+    public long setRemove(String key, Object... values) {
+        try {
+            Long count = redisTemplate.opsForSet().remove(key, values);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    // ===============================list=================================
+
+    /**
+     * 获取list缓存的内容
+     *
+     * @param key   键
+     * @param start 开始
+     * @param end   结束 0 到 -1代表所有值
+     */
+    public List<Object> lGet(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForList().range(key, start, end);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取list缓存的长度
+     *
+     * @param key 键
+     */
+    public long lGetListSize(String key) {
+        try {
+            return redisTemplate.opsForList().size(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 通过索引 获取list中的值
+     *
+     * @param key   键
+     * @param index 索引 index>=0时， 0 表头，1 第二个元素，依次类推；index<0
+     *              时，-1，表尾，-2倒数第二个元素，依次类推
+     */
+    public Object lGetIndex(String key, long index) {
+        try {
+            return redisTemplate.opsForList().index(key, index);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将list放入缓存
+     *
+     * @param key   键
+     * @param value 值
+     */
+    public boolean lSet(String key, Object value) {
+        try {
+            redisTemplate.opsForList().rightPush(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 将list放入缓存
+     *
+     * @param key   键
+     * @param value 值
+     * @param time  时间(秒)
+     */
+    public boolean lSet(String key, Object value, long time) {
+        try {
+            redisTemplate.opsForList().rightPush(key, value);
+            if (time > 0)
+                expire(key, time);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 将list放入缓存
+     *
+     * @param key   键
+     * @param value 值
+     * @return
+     */
+    public boolean lSet(String key, List<Object> value) {
+        try {
+            redisTemplate.opsForList().rightPushAll(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 将list放入缓存
+     *
+     * @param key   键
+     * @param value 值
+     * @param time  时间(秒)
+     * @return
+     */
+    public boolean lSet(String key, List<Object> value, long time) {
+        try {
+            redisTemplate.opsForList().rightPushAll(key, value);
+            if (time > 0)
+                expire(key, time);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 根据索引修改list中的某条数据
+     *
+     * @param key   键
+     * @param index 索引
+     * @param value 值
+     * @return
+     */
+    public boolean lUpdateIndex(String key, long index, Object value) {
+        try {
+            redisTemplate.opsForList().set(key, index, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 移除N个值为value
+     *
+     * @param key   键
+     * @param count 移除多少个
+     * @param value 值
+     * @return 移除的个数
+     */
+    public long lRemove(String key, long count, Object value) {
+        try {
+            Long remove = redisTemplate.opsForList().remove(key, count,
+                    value);
+            return remove;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+}
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\TimeUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/5/28
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class TimeUtils {
+
+
+    /**
+     * 获取当前系统时间，格式为 yyyy-MM-dd HH:mm:ss
+     * @return 时间字符串
+     */
+    public static String getCurrentTimeString(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        return df.format(new Date());
+    }
+
+
+    /**
+     * 将java Date 将对象转化为日期字符串形式
+     * @param date
+     * @return
+     */
+    public static String castDateTypeToDateString(Date date){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(date);
+    }
+
+
+    /**
+     * 把日期字符串转化为 yyyy-MM-dd 日期类型
+     * @param dateStr 日期字符串
+     * @return 日期类型
+     */
+    public static Date castDateStringToDateTypeYMD(String dateStr){
+        Date date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            date = sdf.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\UserAgentUtils.java
+
+
+/**
+ * @Author: Yan Jingcun
+ * @Date: 2021/10/15
+ * @Description:
+ * @Version: 1.0
+ */
+
+package com.jancoyan.jancoblog.utils;
+
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
+public class UserAgentUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(UserAgentUtils.class);
+
+    /**
+     * 根据http获取userAgent信息
+     * @param request
+     * @return
+     */
+    public static String getUserAgent(HttpServletRequest request) {
+        String userAgent=request.getHeader("User-Agent");
+        return userAgent;
+    }
+
+    /**
+     * 根据request获取userAgent，然后解析出osVersion
+     * @param request
+     * @return
+     */
+    public static String getOsVersion(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getOsVersion(userAgent);
+    }
+
+    /**
+     * 根据userAgent解析出osVersion
+     * @param userAgent
+     * @return
+     */
+    public static String getOsVersion(String userAgent) {
+        String osVersion = "";
+        if(StringUtils.isBlank(userAgent))
+            return osVersion;
+        String[] strArr = userAgent.substring(userAgent.indexOf("(")+1,
+                userAgent.indexOf(")")).split(";");
+        if(null == strArr || strArr.length == 0)
+            return osVersion;
+
+        osVersion = strArr[1];
+        logger.info("osVersion is:{}", osVersion);
+        return osVersion;
+    }
+
+    /**
+     * 获取操作系统对象
+     * @param request
+     * @return
+     */
+    private static OperatingSystem getOperatingSystem(String userAgent) {
+        UserAgent agent = UserAgent.parseUserAgentString(userAgent);
+        OperatingSystem operatingSystem = agent.getOperatingSystem();
+        return operatingSystem;
+    }
+
+
+
+    /**
+     * 获取os：Windows/ios/Android
+     * @param request
+     * @return
+     */
+    public static String getOs(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getOs(userAgent);
+    }
+
+    /**
+     * 获取os：Windows/ios/Android
+     * @param request
+     * @return
+     */
+    public static String getOs(String userAgent) {
+        OperatingSystem operatingSystem =  getOperatingSystem(userAgent);
+        String os = operatingSystem.getGroup().getName();
+        logger.info("os is:{}", os);
+        return os;
+    }
+
+
+    /**
+     * 获取deviceType
+     * @param request
+     * @return
+     */
+    public static String getDevicetype(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getDevicetype(userAgent);
+    }
+
+    /**
+     * 获取deviceType
+     * @return
+     */
+    public static String getDevicetype(String userAgent) {
+        OperatingSystem operatingSystem =  getOperatingSystem(userAgent);
+        String deviceType = operatingSystem.getDeviceType().toString();
+        logger.info("deviceType is:{}", deviceType);
+        return deviceType;
+    }
+
+    /**
+     * 获取操作系统的名字
+     * @param request
+     * @return
+     */
+    public static String getOsName(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getOsName(userAgent);
+    }
+
+    /**
+     * 获取操作系统的名字
+     * @return
+     */
+    public static String getOsName(String userAgent) {
+        OperatingSystem operatingSystem =  getOperatingSystem(userAgent);
+        String osName = operatingSystem.getName();
+        logger.info("osName is:{}", osName);
+        return osName;
+    }
+
+
+    /**
+     * 获取device的生产厂家
+     * @param request
+     */
+    public static String getDeviceManufacturer(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getDeviceManufacturer(userAgent);
+    }
+
+    /**
+     * 获取device的生产厂家
+     */
+    public static String getDeviceManufacturer(String userAgent) {
+        OperatingSystem operatingSystem =  getOperatingSystem(userAgent);
+        String deviceManufacturer = operatingSystem.getManufacturer().toString();
+        logger.info("deviceManufacturer is:{}", deviceManufacturer);
+        return deviceManufacturer;
+    }
+
+    /**
+     * 获取浏览器对象
+     * @return
+     */
+    public static Browser getBrowser(String agent) {
+        UserAgent userAgent = UserAgent.parseUserAgentString(agent);
+        Browser browser = userAgent.getBrowser();
+        return browser;
+    }
+
+
+    /**
+     * 获取browser name
+     * @param request
+     * @return
+     */
+    public static String getBorderName(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBorderName(userAgent);
+    }
+
+    /**
+     * 获取browser name
+     * @return
+     */
+    public static String getBorderName(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String borderName = browser.getName();
+        logger.info("borderName is:{}", borderName);
+        return borderName;
+    }
+
+
+    /**
+     * 获取浏览器的类型
+     * @param request
+     * @return
+     */
+    public static String getBorderType(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBorderType(userAgent);
+    }
+
+    /**
+     * 获取浏览器的类型
+     * @return
+     */
+    public static String getBorderType(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String borderType = browser.getBrowserType().getName();
+        logger.info("borderType is:{}", borderType);
+        return borderType;
+    }
+
+    /**
+     * 获取浏览器组： CHROME、IE
+     * @param request
+     * @return
+     */
+    public static String getBorderGroup(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBorderGroup(userAgent);
+    }
+
+    /**
+     * 获取浏览器组： CHROME、IE
+     * @return
+     */
+    public static String getBorderGroup(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String browerGroup = browser.getGroup().getName();
+        logger.info("browerGroup is:{}", browerGroup);
+        return browerGroup;
+    }
+
+    /**
+     * 获取浏览器的生产厂商
+     * @param request
+     * @return
+     */
+    public static String getBrowserManufacturer(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBrowserManufacturer(userAgent);
+    }
+
+
+    /**
+     * 获取浏览器的生产厂商
+     * @return
+     */
+    public static String getBrowserManufacturer(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String browserManufacturer = browser.getManufacturer().getName();
+        logger.info("browserManufacturer is:{}", browserManufacturer);
+        return browserManufacturer;
+    }
+
+
+    /**
+     * 获取浏览器使用的渲染引擎
+     * @param request
+     * @return
+     */
+    public static String getBorderRenderingEngine(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBorderRenderingEngine(userAgent);
+    }
+
+    /**
+     * 获取浏览器使用的渲染引擎
+     * @return
+     */
+    public static String getBorderRenderingEngine(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String renderingEngine = browser.getRenderingEngine().name();
+        logger.info("renderingEngine is:{}", renderingEngine);
+        return renderingEngine;
+    }
+
+
+    /**
+     * 获取浏览器版本
+     * @param request
+     * @return
+     */
+    public static String getBrowserVersion(HttpServletRequest request) {
+        String userAgent = getUserAgent(request);
+        return getBrowserVersion(userAgent);
+    }
+
+    /**
+     * 获取浏览器版本
+     * @return
+     */
+    public static String getBrowserVersion(String userAgent) {
+        Browser browser =  getBrowser(userAgent);
+        String borderVersion = browser.getVersion( userAgent).toString();
+        return borderVersion;
+    }
+
+//    public static void main(String[] args) {
+//        String winUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
+//        System.out.println("浏览器名字："+getBorderName(winUserAgent));
+//        System.out.println("浏览器版本："+getBrowserVersion(winUserAgent));
+//        System.out.println("操作系统的名字："+getOsName(winUserAgent));
+//        System.out.println("操作系统的版本号："+getOsVersion(winUserAgent));
+//    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\java\com\jancoyan\jancoblog\utils\VerifyCodeUtil.java
+
+
+package com.jancoyan.jancoblog.utils;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Random;
+
+/**
+ * @author 遗憾就遗憾吧
+ * @version 1.3
+ * @Date 2019/9/16
+ * @datatime:?serverTimezone=UTC&characterEncoding=utf-8&userSSL=yes
+ * @since 1.2
+ */
+public class VerifyCodeUtil {
+
+
+    //TODO 图片验证生成器
+
+    public static final String RANDOMCODEKEY= "RANDOMVALIDATECODEKEY";//放到session中的key
+    private String randString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
+    private int width = 160;// 图片宽
+    private int height = 40;// 图片高
+    private int lineSize = 40;// 干扰线数量
+    private int stringNum = 4;// 随机产生字符数量
+
+
+    private Random random = new Random();
+
+    /**
+     * 获得字体
+     */
+    private Font getFont() {
+        return new Font("Fixedsys", Font.CENTER_BASELINE, 28);
+    }
+
+    /**
+     * 获得颜色
+     */
+    private Color getRandColor(int fc, int bc) {
+        if (fc > 255)
+            fc = 255;
+        if (bc > 255)
+            bc = 255;
+        int r = fc + random.nextInt(bc - fc - 16);
+        int g = fc + random.nextInt(bc - fc - 14);
+        int b = fc + random.nextInt(bc - fc - 18);
+        return new Color(r, g, b);
+    }
+
+    /**
+     * 生成随机图片
+     */
+    public String getRandcode(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        // BufferedImage类是具有缓冲区的Image类,Image类是用于描述图像信息的类
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+        Graphics g = image.getGraphics();// 产生Image对象的Graphics对象,改对象可以在图像上进行各种绘制操作
+        g.fillRect(0, 0, width, height);//图片大小
+        g.setFont(new Font("Times New Roman", Font.ROMAN_BASELINE, 18));//字体大小
+        g.setColor(getRandColor(110, 133));//字体颜色
+        // 绘制干扰线
+        for (int i = 0; i <= lineSize; i++) {
+            drowLine(g);
+        }
+        // 绘制随机字符
+        String randomString = "";
+        for (int i = 1; i <= stringNum; i++) {
+            randomString = drowString(g, randomString, i);
+        }
+        session.removeAttribute(RANDOMCODEKEY);
+        session.setAttribute(RANDOMCODEKEY, randomString);
+        g.dispose();
+        try {
+            // 将内存中的图片通过流动形式输出到客户端
+            ImageIO.write(image, "JPEG", response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return randomString;
+
+    }
+
+    /**
+     * 绘制字符串
+     */
+    private String drowString(Graphics g, String randomString, int i) {
+        g.setFont(getFont());
+        g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
+                .nextInt(121)));
+        String rand = String.valueOf(getRandomString(random.nextInt(randString
+                .length())));
+        randomString += rand;
+        g.translate(random.nextInt(3), random.nextInt(3));
+        g.drawString(rand, 30 * i, 21);
+        return randomString;
+    }
+
+    /**
+     * 绘制干扰线
+     */
+    private void drowLine(Graphics g) {
+        int x = random.nextInt(width);
+        int y = random.nextInt(height);
+        int xl = random.nextInt(13);
+        int yl = random.nextInt(15);
+        g.drawLine(x, y, x + xl, y + yl);
+    }
+
+    /**
+     * 获取随机的字符
+     */
+    public String getRandomString(int num) {
+        return String.valueOf(randString.charAt(num));
+    }
+}
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\application.yml
+
+
+jar:
+   fileUrl: /home/jancoyan/springbootApp/blog/static
+# fileUrl: C:/Users/Administrator/Pictures/webstatic
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://101.201.64.102/jancoblog?serverTimezone=UTC&characterEncoding=utf-8
+    url: jdbc:mysql://localhost/jancoblog?serverTimezone=UTC&characterEncoding=utf-8
+    username: jancoblog
+    password: 333
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+  web:
+    resources:
+      static-locations: file:${jar.fileUrl},classpath:/static/,
+  redis:
+    host: 101.201.64.102
+    port: 6379
+    password: 333
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  max-http-header-size: 1MB
+  port: 8000
+logging:
+  level:
+    com.jancoyan.jancoblog.mapper: debug
+
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\ArticleImageMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.ArticleImageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.ArticleImage">
+        <id column="filename" property="filename" />
+        <result column="article_id" property="articleId" />
+        <result column="insert_date" property="insertDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        filename, article_id, insert_date
+    </sql>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\ArticleMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.Article">
+        <id column="article_id" property="articleId" />
+        <result column="article_title" property="articleTitle" />
+        <result column="article_author" property="articleAuthor" />
+        <result column="article_type" property="articleType" />
+        <result column="article_summary" property="articleSummary" />
+        <result column="article_html" property="articleHtml" />
+        <result column="article_md" property="articleMd" />
+        <result column="article_is_comment" property="articleIsComment" />
+        <result column="article_rank" property="articleRank" />
+        <result column="article_post_time" property="articlePostTime" />
+        <result column="article_edit_time" property="articleEditTime" />
+        <result column="article_view_count" property="articleViewCount" />
+        <result column="article_comment_count" property="articleCommentCount" />
+        <result column="article_like_count" property="articleLikeCount" />
+        <result column="user_name" property="userName" />
+        <result column="type_name" property="typeName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        article_id, article_title, article_author, article_type, article_summary, article_html, article_md, article_is_comment, article_rank, article_post_time, article_edit_time, article_view_count, article_comment_count, article_like_count
+    </sql>
+
+    <!--    首页文章列表-->
+    <select id="getIndexList" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select * from v_article_list_show ${ew.customSqlSegment}
+    </select>
+
+<!--    管理员能看到的文章列表-->
+    <select id="getManageList" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select * from v_article_manage_list ${ew.customSqlSegment}
+    </select>
+
+<!--    查看文章的时候获取文章整体信息 -->
+    <select id="getSingleArticle" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select * from v_article_get_single where article_id = '${id}'
+    </select>
+
+    <select id="getSingleArticleDeleted" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select * from v_article_get_single_deleted where article_id = '${id}'
+    </select>
+
+<!--    获取删除的文章-->
+    <select id="getDeletedList" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select * from v_article_deleted_list ${ew.customSqlSegment}
+    </select>
+
+
+<!--    彻底删除文章-->
+    <delete id="deleteCompletely">
+        delete from tbl_deleted_article where article_id = '${articleId}'
+    </delete>
+
+
+<!--    恢复用户的文章-->
+    <select id="batchRecover">
+        CALL proc_recover_article(${articleId});
+    </select>
+
+    <!--    获取用户最近发表的文章 -->
+    <select id="getArticleByUserRecently"
+            resultType="com.jancoyan.jancoblog.pojo.PageArticle">
+        select * from v_page_article ${ew.customSqlSegment}
+    </select>
+
+<!--    获取用户文章用于编辑文章-->
+    <select id="getArticleEdit" resultType="com.jancoyan.jancoblog.pojo.Article">
+        select article_id,
+               article_title,
+               article_summary,
+               article_md,
+               article_type,
+               article_is_comment
+               from tbl_article where article_id = '${id}'
+    </select>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\CommentMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.Comment">
+        <id column="comment_id" property="commentId" />
+        <result column="pre_comment_id" property="preCommentId" />
+        <result column="comment_article_id" property="commentArticleId" />
+        <result column="comment_author_id" property="commentAuthorId" />
+        <result column="comment_author_name" property="commentAuthorName" />
+        <result column="comment_author_email" property="commentAuthorEmail" />
+        <result column="comment_content" property="commentContent" />
+        <result column="comment_date" property="commentDate" />
+        <result column="comment_author_ip" property="commentAuthorIp" />
+        <result column="comment_like_count" property="commentLikeCount" />
+        <result column="article_title" property="articleTitle" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        comment_id, pre_comment_id, comment_article_id, comment_author_id, comment_author_name, comment_author_email, comment_content, comment_date, comment_author_ip, comment_like_count
+    </sql>
+
+    <update id="recoverComment">
+        CALL proc_recover_comment(${commentId});
+    </update>
+    <delete id="deleteComment">
+        CALL proc_transfer_comment(${commentId});
+    </delete>
+
+    <select id="getAll" resultType="com.jancoyan.jancoblog.pojo.Comment">
+        select * from v_comment_manage_list ${ew.customSqlSegment}
+    </select>
+
+    <select id="getCommentByArticle" resultType="com.jancoyan.jancoblog.pojo.Comment">
+        select * from v_comment_article ${ew.customSqlSegment}
+    </select>
+
+    <select id="getCommentByUserPosted" resultType="com.jancoyan.jancoblog.pojo.Comment">
+        select * from v_comment_manage_list ${ew.customSqlSegment}
+    </select>
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="PageComment" type="com.jancoyan.jancoblog.pojo.PageComment">
+        <result column="comment_author_name" property="commentAuthorName" />
+        <result column="article_id" property="articleId" />
+        <result column="article_author" property="articleAuthor" />
+        <result column="article_title" property="articleTitle" />
+        <result column="comment_date" property="commentDate" />
+    </resultMap>
+
+    <sql id="Page_Comment">
+        comment_author_name, article_id, article_author, article_title, comment_date
+    </sql>
+
+    <select id="getCommentByUserRecently"
+            resultType="com.jancoyan.jancoblog.pojo.PageComment">
+        select <include refid="Page_Comment" />
+            from v_page_comment ${ew.customSqlSegment}
+    </select>
+
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\DeletedCommentMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.DeletedCommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.DeletedComment">
+        <id column="comment_id" property="commentId" />
+        <result column="pre_comment_id" property="preCommentId" />
+        <result column="comment_article_id" property="commentArticleId" />
+        <result column="comment_author_id" property="commentAuthorId" />
+        <result column="comment_author_name" property="commentAuthorName" />
+        <result column="comment_author_email" property="commentAuthorEmail" />
+        <result column="comment_content" property="commentContent" />
+        <result column="comment_date" property="commentDate" />
+        <result column="comment_author_ip" property="commentAuthorIp" />
+        <result column="comment_like_count" property="commentLikeCount" />
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        comment_id, pre_comment_id, comment_article_id, comment_author_id, comment_author_name, comment_author_email, comment_content, comment_date, comment_author_ip, comment_like_count
+    </sql>
+    <select id="getCommentByArticle"
+            resultType="com.jancoyan.jancoblog.pojo.DeletedComment">
+        select * from  v_comment_article_deleted ${ew.customSqlSegment}
+    </select>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\LikeRecordMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.LikeRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.LikeRecord">
+        <id column="like_id" property="likeId" />
+        <result column="article_id" property="articleId" />
+        <result column="author_id" property="authorId" />
+        <result column="like_date" property="likeDate" />
+        <result column="user_name" property="userName" />
+        <result column="article_title" property="articleTitle" />
+        <result column="article_author" property="articleAuthor" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        like_id, article_id, author_id, like_date,
+    </sql>
+
+    <sql id="Column_List">
+        article_id, article_author, article_title, like_date, user_name
+    </sql>
+
+    <select id="getUserReceive" resultType="com.jancoyan.jancoblog.pojo.LikeRecord">
+        select <include refid="Column_List" />
+        from  v_page_like ${ew.customSqlSegment}
+    </select>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\TypeMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.TypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.Type">
+        <id column="type_id" property="typeId" />
+        <result column="type_name" property="typeName" />
+        <result column="type_description" property="typeDescription" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        type_id, type_name, type_description
+    </sql>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\UserInfoMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.UserInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.UserInfo">
+        <id column="user_id" property="userId" />
+        <result column="user_email" property="userEmail" />
+        <result column="user_sex" property="userSex" />
+        <result column="user_region" property="userRegion" />
+        <result column="user_birthdate" property="userBirthdate" />
+        <result column="user_telephone" property="userTelephone" />
+        <result column="user_real_name" property="userRealName" />
+        <result column="user_school" property="userSchool" />
+        <result column="user_major" property="userMajor" />
+        <result column="user_enter_school_date" property="userEnterSchoolDate" />
+        <result column="user_academic_degree" property="userAcademicDegree" />
+        <result column="user_company" property="userCompany" />
+        <result column="user_position" property="userPosition" />
+        <result column="user_field" property="userField" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, user_email, user_sex, user_region, user_birthdate, user_telephone, user_real_name, user_school, user_major, user_enter_school_date, user_academic_degree, user_company, user_position, user_field
+    </sql>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\UserLoginMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.UserLoginMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.UserLogin">
+        <id column="id" property="id" />
+        <result column="login_user" property="loginUser" />
+        <result column="login_date" property="loginDate" />
+        <result column="login_ip" property="loginIp" />
+        <result column="login_address" property="loginAddress" />
+        <result column="user_agent" property="userAgent" />
+        <result column="browser_name" property="browserName" />
+        <result column="browser_version" property="browserVersion" />
+        <result column="os_name" property="osName" />
+        <result column="os_version" property="osVersion" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, login_user, login_date, login_ip, login_address, user_agent, browser_name,
+        browser_version, os_name, os_version
+    </sql>
+
+</mapper>
+R:\GITHUB\JancoBlog\JancoBlog-v3.0\src\main\resources\mapper\UserMapper.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jancoyan.jancoblog.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jancoyan.jancoblog.pojo.User">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_signature" property="userSignature" />
+        <result column="user_role" property="userRole" />
+        <result column="user_create_date" property="userCreateDate" />
+        <result column="user_last_login_date" property="userLastLoginDate" />
+        <result column="user_ip" property="userIp" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, user_name, user_signature, user_password, user_role, user_create_date,
+        user_last_login_date, user_ip
+    </sql>
+
+
+    <select id="getAll" resultType="com.jancoyan.jancoblog.pojo.User">
+        select * from v_user_manage_show ${ew.customSqlSegment}
+    </select>
+
+
+    <!-- 用户的数据统计信息查询结果列 -->
+    <resultMap id="UserTotalData" type="com.jancoyan.jancoblog.pojo.VUserTotalData">
+        <result column="article_author" property="articleAuthor" />
+        <result column="user_name" property="userName" />
+        <result column="user_signature" property="userSignature" />
+        <result column="total_article" property="totalArticle" />
+        <result column="total_view_count" property="totalViewCount" />
+        <result column="total_like_count" property="totalLikeCount" />
+        <result column="total_comment_count" property="totalCommentCount"/>
+    </resultMap>
+
+    <sql id="User_Total_Data_List">
+        article_author, user_name, user_signature, total_article, total_view_count,
+        total_like_count, total_comment_count
+    </sql>
+
+    <select id="getUserTotalData" resultType="com.jancoyan.jancoblog.pojo.VUserTotalData">
+        select * from v_user_total_data where article_author = ${userId};
+    </select>
+
+    <!--    用户信息的查询结果-->
+    <resultMap id="UserInfoMap" type="com.jancoyan.jancoblog.pojo.UserInfo">
+        <id column="user_id" property="userId" />
+        <result column="user_email" property="userEmail" />
+        <result column="user_sex" property="userSex" />
+        <result column="user_region" property="userRegion"/>
+        <result column="user_birthday" property="userBirthdate" />
+        <result column="user_telephone" property="userTelephone" />
+        <result column="user_real_name" property="userRealName" />
+        <result column="user_school" property="userSchool" />
+        <result column="user_major" property="userMajor"/>
+        <result column="user_enter_school_date" property="userEnterSchoolDate"/>
+        <result column="user_academic_degree" property="userAcademicDegree"/>
+        <result column="user_company" property="userCompany"/>
+        <result column="user_position" property="userPosition"/>
+        <result column="user_field" property="userField"/>
+    </resultMap>
+
+    <!--    用户详细信息的结果列-->
+    <sql id="User_Info_List">
+        user_id, user_email, user_sex, user_region, user_birthdate,
+        user_telephone, user_real_name, user_school, user_major,
+        user_enter_school_date, user_academic_degree, user_company, user_position, user_field
+    </sql>
+
+
+    <select id="getUserInfo" resultType="com.jancoyan.jancoblog.pojo.UserInfo">
+        select * from tbl_user_info where user_id = ${userId}
+    </select>
+
+    <select id="login" resultType="com.jancoyan.jancoblog.pojo.User">
+        select user_id, user_name, user_signature, role_name
+        from v_login
+        where user_name = '${username}' and user_password = '${password}';
+    </select>
+
+
+</mapper>
+
+
